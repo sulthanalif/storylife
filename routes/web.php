@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Routing\ResponseFactory;
+
 /** @var \Laravel\Lumen\Routing\Router $router */
 
 /*
@@ -13,6 +15,25 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+$router->get('/', function () {
+    return dd('Hello World');
+});
+
+$router->get('foo', function () {
+    return response()
+            ->json(['name' => 'Abigail', 'state' => 'CA'])
+});
+
+$router->group(['prefix' => 'api'], function() use($router){
+
+    $router->get('galery', ['uses' => 'GaleryController@index']);
+
+    $router->get('galery/{id}', ['uses' => 'GaleryController@show']);
+
+    $router->post('galery', ['uses' => 'GaleryController@create']);
+
+    $router->put('galery/{id}', ['uses' => 'GaleryController@update']);
+
+    $router->delete('galery/{id}', ['uses' => 'GaleryController@destroy']);
+
 });
