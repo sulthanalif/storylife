@@ -16,24 +16,28 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 */
 
 $router->get('/', function () {
-    return dd('Hello World');
+return view('home');
 });
 
-$router->get('foo', function () {
-    return response()
-            ->json(['name' => 'Abigail', 'state' => 'CA'])
+$router->get('/login', function () {
+return 'ini login';
 });
 
-$router->group(['prefix' => 'api'], function() use($router){
+
+
+
+
+$router->group(['prefix' => 'admin'], function() use($router){
 
     $router->get('galery', ['uses' => 'GaleryController@index']);
 
     $router->get('galery/{id}', ['uses' => 'GaleryController@show']);
 
-    $router->post('galery', ['uses' => 'GaleryController@create']);
+    $router->post('galery', ['uses' => 'GaleryController@store']); // Changed this line to use the 'store' method
 
     $router->put('galery/{id}', ['uses' => 'GaleryController@update']);
 
     $router->delete('galery/{id}', ['uses' => 'GaleryController@destroy']);
 
 });
+

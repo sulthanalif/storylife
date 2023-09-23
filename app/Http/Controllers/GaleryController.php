@@ -4,82 +4,110 @@ namespace App\Http\Controllers;
 
 use App\Models\Galery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class GaleryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar galeri.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        return response()->json('ini index');
+        $galleries = Galery::all();
+        return response()->json($galleries, 200);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan formulir untuk membuat galeri baru.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function create()
     {
-        return response()->json('ini create');
+        return response()->json('Ini adalah halaman untuk membuat galeri', 200);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Menyimpan galeri yang baru dibuat.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        return response()->json('ini store');
+        // Validasi request
+        $this->validate($request, [
+            'tittle' => 'required|string',
+            'description' => 'required|string',
+            'file' => 'required|string'
+        ]);
+
+        // Buat galeri baru
+        $gallery = Galery::create([
+            'tittle' => $request->tittle,
+            'description' => $request->description,
+            'file' => $request->file
+        ]);
+
+        return response()->json($gallery, 201);
     }
+    
 
     /**
-     * Display the specified resource.
+     * Menampilkan detail galeri tertentu.
      *
      * @param  \App\Models\Galery  $galery
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Galery $galery)
     {
-        return response()->json('ini show');
+        return response()->json($galery, 200);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menampilkan formulir untuk mengedit galeri tertentu.
      *
      * @param  \App\Models\Galery  $galery
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function edit(Galery $galery)
     {
-        return response()->json('ini edit');
+        return response()->json('Ini adalah halaman untuk mengedit galeri', 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memperbarui galeri tertentu.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Galery  $galery
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, Galery $galery)
     {
-        return response()->json('ini update');
+        $validatedData = $request->validate([
+            'tittle' => 'required|string',
+            'description' => 'required|string',
+            'file' => 'required|string'
+        ]);
+
+        $galery->update($validatedData);
+
+        return response()->json($galery, 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus galeri tertentu.
      *
      * @param  \App\Models\Galery  $galery
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Galery $galery)
     {
-        return response()->json('ini destroy');
+        $galery->delete();
+
+        return response()->json('Galeri berhasil dihapus', 200);
     }
 }
