@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Galery;
+use App\Models\Gallery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class GaleryController extends Controller
+class GalleryController extends Controller
 {
     /**
      * Menampilkan daftar galeri.
@@ -16,7 +16,7 @@ class GaleryController extends Controller
      */
     public function index()
     {
-        $galleries = Galery::all();
+        $galleries = Gallery::all();
         return response()->json($galleries, 200);
     }
 
@@ -46,68 +46,100 @@ class GaleryController extends Controller
         ]);
 
         // Buat galeri baru
-        $gallery = Galery::create([
+        $gallery = Gallery::create([
             'tittle' => $request->tittle,
             'description' => $request->description,
             'file' => $request->file
         ]);
 
-        return response()->json($gallery, 201);
+        return response()->json($gallery);
     }
     
 
     /**
      * Menampilkan detail galeri tertentu.
      *
-     * @param  \App\Models\Galery  $galery
+     * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Galery $galery)
+    public function show($id)
     {
-        return response()->json($galery, 200);
+        $gallery = Gallery::find($id);
+        if (!$gallery) {
+            return response()->json('Galeri tidak ditemukan', 404);
+        }
+    
+        return response()->json($gallery, 200);
     }
 
     /**
      * Menampilkan formulir untuk mengedit galeri tertentu.
      *
-     * @param  \App\Models\Galery  $galery
+     * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\JsonResponse
      */
-    public function edit(Galery $galery)
+    public function edit($id)
     {
-        return response()->json('Ini adalah halaman untuk mengedit galeri', 200);
+        $gallery = Gallery::find($id);
+
+        if (!$gallery) {
+            return response()->json('Galeri tidak ditemukan', 404);
+        }
+
+    return response()->json($gallery, 200);
     }
 
     /**
      * Memperbarui galeri tertentu.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Galery  $galery
+     * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, Galery $galery)
+    public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'tittle' => 'required|string',
+        $validator = Validator::make($request->all(), [
+            'tittle' => 'required|string', // It should be 'title' instead of 'tittle'
             'description' => 'required|string',
             'file' => 'required|string'
         ]);
-
-        $galery->update($validatedData);
-
-        return response()->json($galery, 200);
+    
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+    
+        $gallery = Gallery::find($id);
+    
+        if (!$gallery) {
+            return response()->json('Galeri tidak ditemukan', 404);
+        }
+    
+        // Update the gallery attributes
+        $gallery->update([
+            'tittle' => $request->input('tittle'), // It should be 'title'
+            'description' => $request->input('description'),
+            'file' => $request->input('file')
+        ]);
+    
+        return response()->json('Berhasil Update galeri'.$gallery, 200);
     }
 
     /**
      * Menghapus galeri tertentu.
      *
-     * @param  \App\Models\Galery  $galery
+     * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Galery $galery)
+    public function destroy($id)
     {
-        $galery->delete();
+        $gallery = Gallery::find($id);
 
+        if (!$gallery) {
+            return response()->json('Galeri tidak ditemukan', 404);
+        }
+    
+        $gallery->delete();
+    
         return response()->json('Galeri berhasil dihapus', 200);
     }
 }

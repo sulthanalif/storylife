@@ -29,15 +29,15 @@ return 'ini login';
 
 $router->group(['prefix' => 'admin'], function() use($router){
 
-    $router->get('galery', ['uses' => 'GaleryController@index']);
+    $router->get('gallery', ['uses' => 'GalleryController@index']);
 
-    $router->get('galery/{id}', ['uses' => 'GaleryController@show']);
+    $router->get('gallery/{id}', ['uses' => 'GalleryController@show']);
 
-    $router->post('galery', ['uses' => 'GaleryController@store']); // Changed this line to use the 'store' method
+    $router->post('gallery', ['uses' => 'GalleryController@store']); // Changed this line to use the 'store' method
 
-    $router->put('galery/{id}', ['uses' => 'GaleryController@update']);
+    $router->put('gallery/{id}', ['uses' => 'GalleryController@update']);
 
-    $router->delete('galery/{id}', ['uses' => 'GaleryController@destroy']);
+    $router->delete('gallery/{id}', ['uses' => 'GalleryController@destroy']);
 
 });
 
