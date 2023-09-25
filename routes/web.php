@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Contracts\Routing\ResponseFactory;
+use App\Http\Controllers\AuthController;
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
@@ -19,9 +20,13 @@ $router->get('/', function () {
 return view('home');
 });
 
-$router->get('/login', function () {
-return 'ini login';
-});
+
+
+$router->post('/register', 'AuthController@register');
+$router->post('/login', 'AuthController@login');
+$router->post('/logout', 'AuthController@logout');
+
+$router->get('/user/{id}', 'UserController@show');
 
 
 
