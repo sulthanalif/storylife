@@ -14,10 +14,30 @@ class GalleryController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     public function index()
     {
         $galleries = Gallery::all();
-        return response()->json($galleries, 200);
+
+        if ($galleries) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil Memuat Data Gallery',
+                'data' => $galleries
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal Memuat Data',
+                'data' => ''
+            ], 400);
+        }
+        
     }
 
     /**
@@ -38,21 +58,48 @@ class GalleryController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi request
-        $this->validate($request, [
+        // Menentukan aturan validasi
+        $rules = [
             'tittle' => 'required|string',
             'description' => 'required|string',
-            'file' => 'required|string'
+            'file' => 'required|string',
+        ];
+
+        // Melakukan validasi
+        $validator = Validator::make($request->all(), $rules);
+
+        // Cek apakah validasi gagal
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors(),
+            ], 400);
+        }
+
+        $tittle = $request->input('tittle');
+        $description = $request->input('description');
+        $file = $request->input('file');
+
+        $galleries = Gallery::create([
+            'tittle' => $tittle,
+            'description' => $description,
+            'file' => $file
         ]);
 
-        // Buat galeri baru
-        $gallery = Gallery::create([
-            'tittle' => $request->tittle,
-            'description' => $request->description,
-            'file' => $request->file
-        ]);
-
-        return response()->json($gallery);
+        if ($galleries) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Gallery Berhasil Dibuat!',
+                'data' => $galleries
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal Membuat Data Gallery',
+                'errors' => $galleries->errors()
+            ], 400);
+        }
     }
     
 
@@ -65,11 +112,20 @@ class GalleryController extends Controller
     public function show($id)
     {
         $gallery = Gallery::find($id);
-        if (!$gallery) {
-            return response()->json('Galeri tidak ditemukan', 404);
+        
+        if ($gallery) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Ditemukan!',
+                'data' => $gallery
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data Tidak Ada',
+                'data' => ''
+            ], 400);
         }
-    
-        return response()->json($gallery, 200);
     }
 
     /**
@@ -81,12 +137,20 @@ class GalleryController extends Controller
     public function edit($id)
     {
         $gallery = Gallery::find($id);
-
-        if (!$gallery) {
-            return response()->json('Galeri tidak ditemukan', 404);
+        
+        if ($gallery) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Ditemukan!',
+                'data' => $gallery
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data Tidak Ada',
+                'data' => ''
+            ], 400);
         }
-
-    return response()->json($gallery, 200);
     }
 
     /**
@@ -98,30 +162,61 @@ class GalleryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'tittle' => 'required|string', // It should be 'title' instead of 'tittle'
+        //rules
+        $rules =[
+            'tittle' => 'required|string',
             'description' => 'required|string',
-            'file' => 'required|string'
-        ]);
-    
+            'file' => 'required|string',
+        ];
+
+        //validasi
+        $validator = Validator::make($request->all(), $rules);
+
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi Gagal',
+                'errors' => $validator->errors()
+            ], 400);
         }
-    
-        $gallery = Gallery::find($id);
-    
-        if (!$gallery) {
-            return response()->json('Galeri tidak ditemukan', 404);
+
+        //ambil data
+        $tittle = $request->input('tittle');
+        $description = $request->input('description');
+        $file = $request->input('file');
+
+        //cari data
+        $gallery = Gallery::where('id', $id)->first();
+
+        //validasi gallery
+        if ($gallery) {
+            $update = $gallery->update([
+                'tittle' => $tittle,
+                'description' =>$description,
+                'file' => $file
+            ]);
+
+             //validasi update
+            if ($update) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data Berhasil Diupdate!',
+                    'data' => $gallery
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data Gagal Diupdate',
+                    'data' => ''
+                ], 400);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data Tidak Ditemukan!',
+                'data' => ''
+            ], 400);
         }
-    
-        // Update the gallery attributes
-        $gallery->update([
-            'tittle' => $request->input('tittle'), // It should be 'title'
-            'description' => $request->input('description'),
-            'file' => $request->input('file')
-        ]);
-    
-        return response()->json('Berhasil Update galeri'.$gallery, 200);
     }
 
     /**
@@ -134,12 +229,18 @@ class GalleryController extends Controller
     {
         $gallery = Gallery::find($id);
 
-        if (!$gallery) {
-            return response()->json('Galeri tidak ditemukan', 404);
+        if ($gallery) {
+            $gallery->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Gallery Berhasil Dihapus!',
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data Tidak Ditemukan',
+            ], 400);
         }
-    
-        $gallery->delete();
-    
-        return response()->json('Galeri berhasil dihapus', 200);
     }
 }
