@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Gallery;
 use Illuminate\Http\Request;
+use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -25,17 +26,9 @@ class GalleryController extends Controller
         $galleries = Gallery::all();
 
         if ($galleries) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil Memuat Data Gallery',
-                'data' => $galleries
-            ], 200);
+            return ResponseFormatter::success($galleries, 'Berhasil Menampilkan Data Gallery');
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal Memuat Data',
-                'data' => ''
-            ], 400);
+            return ResponseFormatter::error('', 'Gagal mengambil Data');
         }
         
     }
@@ -47,7 +40,7 @@ class GalleryController extends Controller
      */
     public function create()
     {
-        return response()->json('Ini adalah halaman untuk membuat galeri', 200);
+        return ResponseFormatter::success('', 'Menampilkan Halaman Form Gallery');
     }
 
     /**
@@ -70,11 +63,7 @@ class GalleryController extends Controller
 
         // Cek apakah validasi gagal
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors(),
-            ], 400);
+            return ResponseFormatter::error('', 'Validasi Gagal');
         }
 
         $tittle = $request->input('tittle');
@@ -86,10 +75,7 @@ class GalleryController extends Controller
 
         //cek apakah bisa atau tidak
         if (!$upload) {
-            return response()->json([
-                'success' => false,
-                'message' => 'File tidak dapat diupload',
-            ], 400);
+            return ResponseFormatter::error('', 'File Tidak Dapat Diupload!');
         }
 
         //simpan
@@ -100,17 +86,9 @@ class GalleryController extends Controller
         ]);
 
         if ($galleries) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Data Gallery Berhasil Dibuat!',
-                'data' => $galleries
-            ], 200);
+            return ResponseFormatter::success($galleries, 'Data Berhasil Disimpan');
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal Membuat Data Gallery',
-                'errors' => $galleries->errors()
-            ], 400);
+            return ResponseFormatter::error('', 'Data Gagal Disimpan');
         }
     }
     
@@ -126,17 +104,9 @@ class GalleryController extends Controller
         $gallery = Gallery::find($id);
         
         if ($gallery) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Data Ditemukan!',
-                'data' => $gallery
-            ], 200);
+            return ResponseFormatter::success($gallery, 'Data Ditemukan');
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data Tidak Ada',
-                'data' => ''
-            ], 400);
+            return ResponseFormatter::error('', 'Data Tidak Ditemukan');
         }
     }
 
@@ -151,17 +121,9 @@ class GalleryController extends Controller
         $gallery = Gallery::find($id);
         
         if ($gallery) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Data Ditemukan!',
-                'data' => $gallery
-            ], 200);
+            return ResponseFormatter::success($gallery, 'Data Ditemukan');
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data Tidak Ada',
-                'data' => ''
-            ], 400);
+            return ResponseFormatter::error('', 'Data Tidak Ditemukan');
         }
     }
 
@@ -185,18 +147,22 @@ class GalleryController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi Gagal',
-                'errors' => $validator->errors()
-            ], 400);
+            return ResponseFormatter::error('', 'Validasi Gagal');
         }
 
         //ambil data
         $tittle = $request->input('tittle');
         $description = $request->input('description');
-        $file = $request->input('file');
+        $file = $request->file('file')->getClientOriginalName();
 
+        //memindahkan file ke repo
+        $upload = $request->file('file')->move('upload', $file);
+
+        //cek apakah bisa atau tidak
+        if (!$upload) {
+            return ResponseFormatter::error('', 'File Tidak Dapat Diupload!');
+        }
+        
         //cari data
         $gallery = Gallery::where('id', $id)->first();
 
@@ -210,24 +176,12 @@ class GalleryController extends Controller
 
              //validasi update
             if ($update) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Data Berhasil Diupdate!',
-                    'data' => $gallery
-                ], 200);
+                return ResponseFormatter::success($update, 'Data Berhasil Diubah');
             } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Data Gagal Diupdate',
-                    'data' => ''
-                ], 400);
+                return ResponseFormatter::error('', 'Data Gagal Diubah');
             }
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data Tidak Ditemukan!',
-                'data' => ''
-            ], 400);
+            return ResponseFormatter::error('', 'Data Tidak Ditemukan');
         }
     }
 
@@ -250,15 +204,9 @@ class GalleryController extends Controller
             
             $gallery->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Data Gallery Berhasil Dihapus!',
-            ], 200);
+            return ResponseFormatter::error('' , 'Data Berhasil Dihapus');
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data Tidak Ditemukan',
-            ], 400);
+            return ResponseFormatter::error('', 'Data Tidak Ditemukan');
         }
     }
 }

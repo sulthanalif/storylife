@@ -27,11 +27,7 @@ class AuthController extends Controller
 
         // Cek apakah validasi gagal
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors(),
-            ], 400);
+            return ResponseFormatter::error('', 'Email sudah terpakai', 400);
         }
 
         $name = $request->input('name');
@@ -39,10 +35,7 @@ class AuthController extends Controller
         
         //cek apakan password sama dengan konfirmasi password
         if ($request->input('password') != $request->input('konfirm_pass')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Password dan Konfirmasi Password harus sama!',
-            ], 400);
+            return ResponseFormatter::error('', 'Password dan Konfirmasi Password harus sama!', 400);
         }
         
         $password = Hash::make($request->input('password'));
@@ -54,18 +47,9 @@ class AuthController extends Controller
         ]);
 
         if ($register) {
-            return ResponseFormatter::success($register, 'Registrasi Berhasil')
-            // return response()->json([
-            //     'success' => true,
-            //     'message' => 'Registrasi Berhasil!',
-            //     'data' => $register,
-            // ], 200);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Registrasi Tidak Berhasil!',
-                'data' => '',
-            ], 400);
+            return ResponseFormatter::success($register, 'Registrasi Berhasil');
+            } else {
+            return ResponseFormatter::error('', 'Registrasi Tidak Berhasil');
         }
 
     }
@@ -80,11 +64,7 @@ class AuthController extends Controller
         $validator = Validator::make( $request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi Gagal',
-                'data' => $validator->errors()
-            ], 400);
+            return ResponseFormatter::error('', 'Validasi Gagal!', 400);
         }
 
         //ambil data
@@ -104,28 +84,13 @@ class AuthController extends Controller
                 $user->update([
                     'api_token' => $apiToken,
                 ]);
+                return ResponseFormatter::success(['user' => $user, 'api_token' =>  $apiToken], 'Login Berhasil!');
 
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Login Berhasil!',
-                    'data' => [
-                        'user' => $user,
-                        'api_token' => $apiToken,
-                    ],
-                ], 200);
             } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Login Gagal!!',
-                    'data' => '',
-                ], 400);
+                return ResponseFormatter::error('', 'Login Gagal!');
             }
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Email atau Password Salah',
-                'data' => ''
-            ], 400);
+            return ResponseFormatter::error('', 'Email atau Password Salah');
         }
 
         
@@ -142,19 +107,10 @@ class AuthController extends Controller
             // Hapus api_token user
             $user->update(['api_token' => null]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Logout berhasil!',
-                'data' => ''
-            ], 200);
+            return ResponseFormatter::success($user, 'Logout Berhasil');
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Logout gagal! Pengguna tidak ditemukan.',
-                'data' => ''
-            ], 400);
+            return ResponseFormatter::error('', 'Logout Gagal');
         }
 
-    // return response()->json($user);
     }
 }
