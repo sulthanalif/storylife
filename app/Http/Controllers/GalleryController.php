@@ -55,6 +55,7 @@ class GalleryController extends Controller
         $rules = [
             'tittle' => 'required|string',
             'description' => 'required|string',
+            'category_id' => 'required',
             'file' => 'required',
         ];
 
@@ -68,6 +69,7 @@ class GalleryController extends Controller
 
         $tittle = $request->input('tittle');
         $description = $request->input('description');
+        $category_id = $request->input('category_id');
         $file = $request->file('file')->getClientOriginalName();
 
         //memindahkan file ke repo
@@ -82,6 +84,7 @@ class GalleryController extends Controller
         $galleries = Gallery::create([
             'tittle' => $tittle,
             'description' => $description,
+            'category_id' => $category_id,
             'file' => $file
         ]);
 
@@ -137,22 +140,24 @@ class GalleryController extends Controller
     public function update(Request $request, $id)
     {
         //rules
-        $rules =[
-            'tittle' => 'required|string',
-            'description' => 'required|string',
-            'file' => 'required|string',
-        ];
+        // $rules = [
+        //     'tittle' => 'required|string',
+        //     'description' => 'required|string',
+        //     'category_id' => 'required',
+        //     'file' => 'required',
+        // ];
 
-        //validasi
-        $validator = Validator::make($request->all(), $rules);
+        // // Melakukan validasi
+        // $validator = Validator::make($request->all(), $rules);
 
-        if ($validator->fails()) {
-            return ResponseFormatter::error('', 'Validasi Gagal');
-        }
+        // if ($validator->fails()) {
+        //     return ResponseFormatter::error($validator->errors(), 'Validasi Gagal');
+        // }
 
         //ambil data
         $tittle = $request->input('tittle');
         $description = $request->input('description');
+        $category_id = $request->input('category_id');
         $file = $request->file('file')->getClientOriginalName();
 
         //memindahkan file ke repo
@@ -162,15 +167,22 @@ class GalleryController extends Controller
         if (!$upload) {
             return ResponseFormatter::error('', 'File Tidak Dapat Diupload!');
         }
-        
+
         //cari data
         $gallery = Gallery::where('id', $id)->first();
 
+        //hapus file lama
+        $fileToDelete = base_path('public/upload/' . $gallery->file);
+            if (file_exists($fileToDelete)) {
+                unlink($fileToDelete);
+            }
+        
         //validasi gallery
         if ($gallery) {
             $update = $gallery->update([
                 'tittle' => $tittle,
                 'description' =>$description,
+                'category_id' =>$category_id,
                 'file' => $file
             ]);
 
@@ -204,7 +216,7 @@ class GalleryController extends Controller
             
             $gallery->delete();
 
-            return ResponseFormatter::error('' , 'Data Berhasil Dihapus');
+            return ResponseFormatter::success('' , 'Data Berhasil Dihapus');
         } else {
             return ResponseFormatter::error('', 'Data Tidak Ditemukan');
         }

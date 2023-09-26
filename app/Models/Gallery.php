@@ -9,6 +9,11 @@ class Gallery extends Model
     protected $table = 'galleries'; // Specify the table name
     
     protected $fillable = [
-        'tittle', 'description', 'file'
+        'tittle', 'description', 'category_id', 'file'
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

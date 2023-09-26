@@ -39,11 +39,22 @@ $router->group(['prefix' => 'admin'], function() use($router){
 
     $router->get('gallery/{id}', ['uses' => 'GalleryController@show']);
 
-    $router->post('gallery', ['uses' => 'GalleryController@store']); // Changed this line to use the 'store' method
+    $router->post('gallery', ['uses' => 'GalleryController@store']); 
 
-    $router->put('gallery/{id}', ['uses' => 'GalleryController@update']);
+    $router->post('gallery/{id}', ['uses' => 'GalleryController@update']);
 
     $router->delete('gallery/{id}', ['uses' => 'GalleryController@destroy']);
 
+
+    //category
+    $router->get('category', ['uses' => 'CategoryController@index']);
+
+    $router->get('category/{id}', ['uses' => 'CategoryController@show']);
+
+    $router->post('category', ['uses' => 'CategoryController@store']);
+
+    $router->post('category/{id}', ['uses' => 'CategoryController@update']);
+
+    $router->delete('category/{id}', ['uses' => 'CategoryController@destroy']);
 });
 
