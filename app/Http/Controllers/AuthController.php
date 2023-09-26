@@ -54,7 +54,7 @@ class AuthController extends Controller
         ]);
 
         if ($register) {
-            return ResponeFormat::success($register, 'Registrasi Berhasil')
+            return ResponseFormatter::success($register, 'Registrasi Berhasil')
             // return response()->json([
             //     'success' => true,
             //     'message' => 'Registrasi Berhasil!',
