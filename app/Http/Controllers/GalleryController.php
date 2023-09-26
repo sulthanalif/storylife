@@ -19,7 +19,7 @@ class GalleryController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     public function index()
     {
         $galleries = Gallery::all();
@@ -62,7 +62,7 @@ class GalleryController extends Controller
         $rules = [
             'tittle' => 'required|string',
             'description' => 'required|string',
-            'file' => 'required|string',
+            'file' => 'required',
         ];
 
         // Melakukan validasi
@@ -79,8 +79,20 @@ class GalleryController extends Controller
 
         $tittle = $request->input('tittle');
         $description = $request->input('description');
-        $file = $request->input('file');
+        $file = $request->file('file')->getClientOriginalName();
 
+        //memindahkan file ke repo
+        $upload = $request->file('file')->move('upload', $file);
+
+        //cek apakah bisa atau tidak
+        if (!$upload) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File tidak dapat diupload',
+            ], 400);
+        }
+
+        //simpan
         $galleries = Gallery::create([
             'tittle' => $tittle,
             'description' => $description,
@@ -230,6 +242,12 @@ class GalleryController extends Controller
         $gallery = Gallery::find($id);
 
         if ($gallery) {
+            // Hapus file terkait
+            $fileToDelete = base_path('public/upload/' . $gallery->file);
+            if (file_exists($fileToDelete)) {
+                unlink($fileToDelete);
+            }
+            
             $gallery->delete();
 
             return response()->json([

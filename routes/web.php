@@ -33,7 +33,8 @@ $router->get('/user/{id}', 'UserController@show');
 
 
 $router->group(['prefix' => 'admin'], function() use($router){
-
+    
+     //gallery
     $router->get('gallery', ['uses' => 'GalleryController@index']);
 
     $router->get('gallery/{id}', ['uses' => 'GalleryController@show']);

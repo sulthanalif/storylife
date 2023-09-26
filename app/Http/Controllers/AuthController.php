@@ -17,6 +17,7 @@ class AuthController extends Controller
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|string',
+            'konfirm_pass' => 'required|string',
         ];
 
         // Melakukan validasi
@@ -31,9 +32,17 @@ class AuthController extends Controller
             ], 400);
         }
 
-
         $name = $request->input('name');
         $email = $request->input('email');
+        
+        //cek apakan password sama dengan konfirmasi password
+        if ($request->input('password') != $request->input('konfirm_pass')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password dan Konfirmasi Password harus sama!',
+            ], 400);
+        }
+        
         $password = Hash::make($request->input('password'));
 
         $register = User::create([
