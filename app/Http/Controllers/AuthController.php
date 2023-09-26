@@ -7,6 +7,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\ResponseFormatter;
+
 
 class AuthController extends Controller
 {
@@ -52,11 +54,12 @@ class AuthController extends Controller
         ]);
 
         if ($register) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Registrasi Berhasil!',
-                'data' => $register,
-            ], 200);
+            return ResponeFormat::success($register, 'Registrasi Berhasil')
+            // return response()->json([
+            //     'success' => true,
+            //     'message' => 'Registrasi Berhasil!',
+            //     'data' => $register,
+            // ], 200);
         } else {
             return response()->json([
                 'success' => false,
