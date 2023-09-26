@@ -16,4 +16,9 @@ class Category extends Model
     {
         return $this->hasMany(Gallery::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

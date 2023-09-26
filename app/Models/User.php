@@ -30,4 +30,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password', 'api_token', 
     ];
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

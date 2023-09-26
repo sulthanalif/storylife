@@ -56,5 +56,17 @@ $router->group(['prefix' => 'admin'], function() use($router){
     $router->post('category/{id}', ['uses' => 'CategoryController@update']);
 
     $router->delete('category/{id}', ['uses' => 'CategoryController@destroy']);
+
+
+    //review
+    $router->get('review', ['uses' => 'ReviewController@index']);
+
+    $router->get('review/{id}', ['uses' => 'ReviewController@show']);
+
+    $router->post('review', ['uses' => 'ReviewController@store']);
+
+    $router->post('review/{id}', ['uses' => 'ReviewController@update']);
+
+    $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
 });
 
