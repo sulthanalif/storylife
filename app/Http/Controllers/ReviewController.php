@@ -170,7 +170,7 @@ class ReviewController extends Controller
 
         //cek simpan
         if ($simpan) {
-            return ResponseFormatter::success($simpan, 'Review Berhasil Disimpan');
+            return ResponseFormatter::success($review, 'Review Berhasil Disimpan');
         } else {
             return ResponseFormatter::error('', 'Review Gagal Disimpan');
         }

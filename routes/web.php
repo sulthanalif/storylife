@@ -41,7 +41,7 @@ $router->group(['prefix' => 'admin'], function() use($router){
 
     $router->post('gallery', ['uses' => 'GalleryController@store']); 
 
-    $router->post('gallery/{id}', ['uses' => 'GalleryController@update']);
+    $router->put('gallery/{id}', ['uses' => 'GalleryController@update']);
 
     $router->delete('gallery/{id}', ['uses' => 'GalleryController@destroy']);
 
@@ -53,7 +53,7 @@ $router->group(['prefix' => 'admin'], function() use($router){
 
     $router->post('category', ['uses' => 'CategoryController@store']);
 
-    $router->post('category/{id}', ['uses' => 'CategoryController@update']);
+    $router->put('category/{id}', ['uses' => 'CategoryController@update']);
 
     $router->delete('category/{id}', ['uses' => 'CategoryController@destroy']);
 
@@ -65,7 +65,7 @@ $router->group(['prefix' => 'admin'], function() use($router){
 
     $router->post('review', ['uses' => 'ReviewController@store']);
 
-    $router->post('review/{id}', ['uses' => 'ReviewController@update']);
+    $router->put('review/{id}', ['uses' => 'ReviewController@update']);
 
     $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
 });
