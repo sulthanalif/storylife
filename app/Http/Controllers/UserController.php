@@ -164,4 +164,11 @@ class UserController extends Controller
 
         return ResponseFormatter::success('', 'Data User Berhasil Dihapus');
     }
+
+    public function cek() 
+    {
+        $url = route('profile');
+
+        return ResponseFormatter::success($url, 'url ditemukan');
+    }
 }

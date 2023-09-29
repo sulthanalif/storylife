@@ -26,7 +26,7 @@ $router->post('/register', 'AuthController@register');
 $router->post('/login', 'AuthController@login');
 $router->post('/logout', 'AuthController@logout');
 
-$router->get('/user/{id}', 'UserController@show');
+
 
 
 
@@ -68,5 +68,24 @@ $router->group(['prefix' => 'admin'], function() use($router){
     $router->put('review/{id}', ['uses' => 'ReviewController@update']);
 
     $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
+
+
+    //user
+    $router->get('user', ['uses' => 'UserController@index']);
+
+    $router->get('user/{id}', ['uses' => 'UserController@show']);
+
+    $router->post('user', ['uses' => 'UserController@store']);
+
+    $router->put('user/profile/{id}', [
+        'uses' => 'UserController@updateProfile',
+        'as' => 'profile'
+    ]);
+
+    $router->put('user/password/{id}', ['uses' => 'UserController@updatePass', 'as' => 'password']);
+
+    $router->delete('user/{id}', ['uses' => 'UserController@destroy']);
+
+    $router->get('cekcek' , ['uses', 'UserController@cek']);
 });
 
