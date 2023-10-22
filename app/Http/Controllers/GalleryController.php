@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseFormatter;
 use App\Models\Gallery;
 use Illuminate\Http\Request;
-use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 
 class GalleryController extends Controller
 {
@@ -16,10 +15,10 @@ class GalleryController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
 
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+//    public function __construct()
+//    {
+//        $this->middleware('auth');
+//    }
 
     public function index()
     {
@@ -30,7 +29,7 @@ class GalleryController extends Controller
         } else {
             return ResponseFormatter::error('', 'Gagal mengambil Data');
         }
-        
+
     }
 
     /**
@@ -46,7 +45,7 @@ class GalleryController extends Controller
     /**
      * Menyimpan galeri yang baru dibuat.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
@@ -94,18 +93,18 @@ class GalleryController extends Controller
             return ResponseFormatter::error('', 'Data Gagal Disimpan');
         }
     }
-    
+
 
     /**
      * Menampilkan detail galeri tertentu.
      *
-     * @param  \App\Models\Gallery  $gallery
+     * @param \App\Models\Gallery $gallery
      * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
         $gallery = Gallery::find($id);
-        
+
         if ($gallery) {
             return ResponseFormatter::success($gallery, 'Data Ditemukan');
         } else {
@@ -116,13 +115,13 @@ class GalleryController extends Controller
     /**
      * Menampilkan formulir untuk mengedit galeri tertentu.
      *
-     * @param  \App\Models\Gallery  $gallery
+     * @param \App\Models\Gallery $gallery
      * @return \Illuminate\Http\JsonResponse
      */
     public function edit($id)
     {
         $gallery = Gallery::find($id);
-        
+
         if ($gallery) {
             return ResponseFormatter::success($gallery, 'Data Ditemukan');
         } else {
@@ -133,8 +132,8 @@ class GalleryController extends Controller
     /**
      * Memperbarui galeri tertentu.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Gallery  $gallery
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Gallery $gallery
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
@@ -173,20 +172,20 @@ class GalleryController extends Controller
 
         //hapus file lama
         $fileToDelete = base_path('public/upload/' . $gallery->file);
-            if (file_exists($fileToDelete)) {
-                unlink($fileToDelete);
-            }
-        
+        if (file_exists($fileToDelete)) {
+            unlink($fileToDelete);
+        }
+
         //validasi gallery
         if ($gallery) {
             $update = $gallery->update([
                 'tittle' => $tittle,
-                'description' =>$description,
-                'category_id' =>$category_id,
+                'description' => $description,
+                'category_id' => $category_id,
                 'file' => $file
             ]);
 
-             //validasi update
+            //validasi update
             if ($update) {
                 return ResponseFormatter::success($update, 'Data Berhasil Diubah');
             } else {
@@ -200,7 +199,7 @@ class GalleryController extends Controller
     /**
      * Menghapus galeri tertentu.
      *
-     * @param  \App\Models\Gallery  $gallery
+     * @param \App\Models\Gallery $gallery
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
@@ -213,12 +212,23 @@ class GalleryController extends Controller
             if (file_exists($fileToDelete)) {
                 unlink($fileToDelete);
             }
-            
+
             $gallery->delete();
 
-            return ResponseFormatter::success('' , 'Data Berhasil Dihapus');
+            return ResponseFormatter::success('', 'Data Berhasil Dihapus');
         } else {
             return ResponseFormatter::error('', 'Data Tidak Ditemukan');
+        }
+    }
+
+    public function getList()
+    {
+        $galleries = Gallery::all();
+
+        if ($galleries) {
+            return ResponseFormatter::success($galleries, 'Berhasil Menampilkan Data Gallery');
+        } else {
+            return ResponseFormatter::error('', 'Gagal mengambil Data');
         }
     }
 }

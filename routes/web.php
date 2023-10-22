@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Contracts\Routing\ResponseFactory;
-use App\Http\Controllers\AuthController;
-
 /** @var \Laravel\Lumen\Routing\Router $router */
 
 /*
@@ -16,34 +13,25 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-$router->get('/', function () {
-return view('home');
+$router->get('/', function () use ($router) {
+    return $router->app->version();
 });
 
 
+$router->group(['prefix' => 'api/v1'], function () use ($router) {
+    $router->post('/register', 'AuthController@register');
+    $router->post('/login', 'AuthController@login');
+    $router->get('/gallery/get-list', 'GalleryController@getList');
 
-$router->post('/register', 'AuthController@register');
-$router->post('/login', 'AuthController@login');
-$router->post('/logout', 'AuthController@logout');
-
-
-
-
-
-
-
-$router->group(['prefix' => 'admin'], function() use($router){
-    
-     //gallery
-    $router->get('gallery', ['uses' => 'GalleryController@index']);
-
-    $router->get('gallery/{id}', ['uses' => 'GalleryController@show']);
-
-    $router->post('gallery', ['uses' => 'GalleryController@store']); 
-
-    $router->put('gallery/{id}', ['uses' => 'GalleryController@update']);
-
-    $router->delete('gallery/{id}', ['uses' => 'GalleryController@destroy']);
+    $router->group(['middleware' => 'auth'], function () use ($router) {
+        $router->post('/logout', 'AuthController@logout');
+        $router->get('gallery', ['uses' => 'GalleryController@index']);
+        $router->get('gallery/{id}', ['uses' => 'GalleryController@show']);
+        $router->post('gallery', ['uses' => 'GalleryController@store']);
+        $router->put('gallery/{id}', ['uses' => 'GalleryController@update']);
+        $router->delete('gallery/{id}', ['uses' => 'GalleryController@destroy']);
+    });
+    //gallery
 
 
     //category
@@ -86,6 +74,6 @@ $router->group(['prefix' => 'admin'], function() use($router){
 
     $router->delete('user/{id}', ['uses' => 'UserController@destroy']);
 
-    $router->get('cekcek' , ['uses', 'UserController@cek']);
+    $router->get('cekcek', ['uses', 'UserController@cek']);
 });
 

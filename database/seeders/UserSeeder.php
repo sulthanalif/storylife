@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -14,9 +14,9 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $users = [
-            ['name' => 'Sulthan Alif Hayatyo', 'email' => 'sulthan@gmail.com', 'password' => 'password', 'api_token' => 'TFhhVVZtMGtSNlBlTENESjhzVG1KRXY2WVg2Ymo4V1pjbFdkWTkzUA=='],
-            ['name' => 'Sutio Mudiarno', 'email' => 'sutio@gmail.com', 'password' => 'password', 'api_token' => 'TFhhVVZtMGtSNlBlTENESjhzVG1KRXY2WVg2Ymo4V1pjbFdkWTkzUA=='],
-            ['name' => 'Muh Hilman Sholehudin', 'email' => 'hilman@gmail.com', 'password' => 'password', 'api_token' => 'TFhhVVZtMGtSNlBlTENESjhzVG1KRXY2WVg2Ymo4V1pjbFdkWTkzUA=='],
+            ['name' => 'Sulthan Alif Hayatyo', 'email' => 'sulthan@gmail.com', 'password' => Hash::make('password'), 'api_token' => 'TFhhVVZtMGtSNlBlTENESjhzVG1KRXY2WVg2Ymo4V1pjbFdkWTkzUA=='],
+            ['name' => 'Sutio Mudiarno', 'email' => 'sutio@gmail.com', 'password' => Hash::make('password'), 'api_token' => 'TFhhVVZtMGtSNlBlTENESjhzVG1KRXY2WVg2Ymo4V1pjbFdkWTkzUA=='],
+            ['name' => 'Muh Hilman Sholehudin', 'email' => 'hilman@gmail.com', 'password' => Hash::make('password'), 'api_token' => 'TFhhVVZtMGtSNlBlTENESjhzVG1KRXY2WVg2Ymo4V1pjbFdkWTkzUA=='],
         ];
 
         foreach ($users as $user) {
