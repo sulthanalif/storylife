@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('tittle');
             $table->text('description');
             $table->string('file');
+            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('category_id')->references('id')->on('categories');

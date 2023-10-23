@@ -4,10 +4,11 @@ namespace App\Models;
 
 use App\Helpers\UUIDGenerator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Service extends Model
 {
-    use UUIDGenerator;
+    use UUIDGenerator, SoftDeletes;
 
     protected $table = 'services'; // Specify the table name
     protected $keyType = 'string';

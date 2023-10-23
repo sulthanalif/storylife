@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->binary('image');
             $table->uuid('status_id')->nullable();
+            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('status_id')->references('id')->on('statuses');
