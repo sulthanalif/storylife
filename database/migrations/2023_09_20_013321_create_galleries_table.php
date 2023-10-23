@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('galleries', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('category_id')->nullable();
+            $table->uuid('id')->primary();
+            $table->uuid('category_id')->nullable();
             $table->string('tittle');
             $table->text('description');
             $table->string('file');
