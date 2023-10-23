@@ -5,21 +5,18 @@ namespace App\Models;
 use App\Helpers\UUIDGenerator;
 use Illuminate\Database\Eloquent\Model;
 
-class Status extends Model
+class Service extends Model
 {
     use UUIDGenerator;
 
-    protected $table = 'statuses'; // Specify the table name
+    protected $table = 'services'; // Specify the table name
     protected $keyType = 'string';
     protected $primaryKey = 'id';
     public $incrementing = false;
 
-    protected $fillable = [
-        'name', 'description'
-    ];
 
-    public function service() 
+    public function status()
     {
-        return $this->belongsTo(Service::class);
+        return $this->hasOne(Status::class);
     }
 }
