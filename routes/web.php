@@ -30,8 +30,52 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->post('gallery', ['uses' => 'GalleryController@store']);
         $router->put('gallery/{id}', ['uses' => 'GalleryController@update']);
         $router->delete('gallery/{id}', ['uses' => 'GalleryController@destroy']);
+        
+        //status
+       $router->get('status', ['uses' => 'StatusController@index']);
+       $router->get('status/{id}', ['uses' => 'StatusController@show']);
+       $router->post('status', ['uses' => 'StatusController@store']);
+       $router->put('status/{id}', ['uses' => 'StatusController@update']);
+       $router->delete('status/{id}', ['uses' => 'StatusController@destroy']); 
+       $router->put('status/{id}', ['uses' => 'StatusController@restore']);
+        // $router->group(['middleware' => 'check-signature-url-expiration'], function () use ($router) {
+        //     $router->get('/form', 'ExampleController@form');
+        // });
+
+        //service
+        $router->get('service', ['uses' => 'ServiceController@index']);
+        $router->get('service/form', ['uses' => 'ServiceController@create']);
+        $router->post('service', ['uses' => 'ServiceController@store']);
+        $router->get('service/{id}', ['uses' => 'ServiceController@show']);
+        $router->get('service/edit/{id}', ['uses' => 'ServiceController@edit']);
+        $router->put('service/{id}', ['uses' => 'ServiceController@update']);
+        $router->delete('service/{id}', ['uses' => 'ServiceController@destroy']);
+        $router->put('service/{id}', ['uses' => 'ServiceController@restore']);
+
+        //user
+        $router->get('user', ['uses' => 'UserController@index']);
+    
+        $router->get('user/{id}', ['uses' => 'UserController@show']);
+    
+        $router->post('user', ['uses' => 'UserController@store']);
+    
+        $router->put('user/profile/{id}', [
+            'uses' => 'UserController@updateProfile',
+            'as' => 'profile'           
+        ]);
+    
+        $router->put('user/password/{id}', ['uses' => 'UserController@updatePass', 'as' => 'password']);
+    
+        $router->delete('user/{id}', ['uses' => 'UserController@destroy']);
+    
+        $router->get('cekcek', ['uses', 'UserController@cek']);
     });
-    //gallery
+
+    });
+    
+    
+   
+
 
 
     //category
@@ -58,22 +102,4 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
 
 
-    //user
-    $router->get('user', ['uses' => 'UserController@index']);
-
-    $router->get('user/{id}', ['uses' => 'UserController@show']);
-
-    $router->post('user', ['uses' => 'UserController@store']);
-
-    $router->put('user/profile/{id}', [
-        'uses' => 'UserController@updateProfile',
-        'as' => 'profile'
-    ]);
-
-    $router->put('user/password/{id}', ['uses' => 'UserController@updatePass', 'as' => 'password']);
-
-    $router->delete('user/{id}', ['uses' => 'UserController@destroy']);
-
-    $router->get('cekcek', ['uses', 'UserController@cek']);
-});
 

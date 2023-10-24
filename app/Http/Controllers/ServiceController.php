@@ -25,7 +25,7 @@ class ServiceController extends Controller
     {
         $services = Service::all();
 
-        if (isEmpty($services)) {
+        if ($services->isEmpty()) {
             return ResponseFormatter::error('', 'Belum Ada Data Pelayanan');
         }
 
@@ -39,7 +39,7 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        //
+        return ResponseFormatter::success('', 'Halaman Create Service');
     }
 
     /**
@@ -90,9 +90,15 @@ class ServiceController extends Controller
      * @param  \App\Models\Service  $service
      * @return \Illuminate\Http\Response
      */
-    public function show(Service $service)
+    public function show($id)
     {
-        //
+        $data = Service::find($id);
+
+        if (!$data) {
+            return ResponseFormatter::error('', 'Data Tidak Ditemukan');
+        }
+
+        return ResponseFormatter::success($data, 'Data Ditemukan');
     }
 
     /**
@@ -101,9 +107,15 @@ class ServiceController extends Controller
      * @param  \App\Models\Service  $service
      * @return \Illuminate\Http\Response
      */
-    public function edit(Service $service)
+    public function edit($id)
     {
-        //
+        $data = Service::find($id);
+
+        if (!$data) {
+            return ResponseFormatter::error('', 'Data Tidak Ditemukan');
+        }
+
+        return ResponseFormatter::success($data, 'Data Ditemukan dan Masuk Halaman Edit');
     }
 
     /**
@@ -113,9 +125,48 @@ class ServiceController extends Controller
      * @param  \App\Models\Service  $service
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Service $service)
+    public function update(Request $request, $id)
     {
-        //
+        //rules
+        $rules = [
+            'name' => 'required|string',
+            'description' => 'string',
+            'image' => 'required',
+            'status_id' => 'required'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error('', $validator->errors());
+        }
+
+        $name = $request->input('name');
+        $description = $request->input('description');
+        $status_id = $request->input('status_id');
+
+        $file = $request->file('image');
+        $imageData = EncodeFile::encodeFile($file);
+
+        //cari data yg mau di edit
+        $service = Service::find($id);
+
+        if (!$service) {
+            return ResponseFormatter::error('', 'Data Tidak Ditemukan');
+        }
+
+        $update = $service->update([
+            'name' => $name,
+            'description' => $description,
+            'image' => $imageData,
+            'status_id' => $status_id 
+        ]);
+
+        if (!$update) {
+            return ResponseFormatter::error('', 'Data Gagal Diupdate');
+        }
+
+        return ResponseFormatter::success($update, 'Data Berhasil Terupdate');
     }
 
     /**
@@ -124,8 +175,28 @@ class ServiceController extends Controller
      * @param  \App\Models\Service  $service
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Service $service)
+    public function destroy($id)
     {
-        //
+        $service = Service::find($id);
+
+        if ($service) {
+            $service->delete();
+
+            return ResponseFormatter::success('', 'Data Berhasil Dihapus');
+        } else {
+            return ResponseFormatter::error('', 'Data Gagal Dihapus');
+        }
+    }
+
+    public function restore($id) 
+    {
+        $data = Service::withTrashed()->where('id', $id)->first();
+        $restore = $data->restore();
+
+        if (!$restore) {
+            return ResponseFormatter::error('', 'Gagal Restore Data');
+        }
+
+        return ResponseFormatter::success('', 'Berhasil Restore');
     }
 }

@@ -14,6 +14,9 @@ class Service extends Model
     protected $keyType = 'string';
     protected $primaryKey = 'id';
     public $incrementing = false;
+    protected $fillable = [
+        'name', 'description', 'image', 'status_id'
+    ];
 
 
     public function status()

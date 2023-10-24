@@ -21,7 +21,7 @@ class StatusController extends Controller
     {
         $statuses = Status::all();
 
-        if (isEmpty($statuses)){
+        if ($statuses->isEmpty()){
             return ResponseFormatter::error('', 'Data Belum Ada');
         } 
 
@@ -175,5 +175,17 @@ class StatusController extends Controller
         } else {
             return ResponseFormatter::error('', 'Data Status Gagal Dihapus');
         }
+    }
+
+    public function restore($id) 
+    {
+        $data = Status::withTrashed()->where('id', $id)->first();
+        $restore = $data->restore();
+
+        if (!$restore) {
+            return ResponseFormatter::error('', 'Gagal Restore Data');
+        }
+
+        return ResponseFormatter::success('', 'Berhasil Restore');
     }
 }

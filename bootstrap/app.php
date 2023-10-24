@@ -79,6 +79,7 @@ $app->configure('app');
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
+    // 'check-signature-url-expiration' => App\Http\Middleware\CheckSignatureUrlExpiration::class,
 ]);
 
 /*
@@ -96,6 +97,9 @@ $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+// $app->bind('signature-url', function ($app) {
+//     return new \App\Helpers\SignatureUrlHelper;
+// });
 
 /*
 |--------------------------------------------------------------------------
@@ -110,6 +114,7 @@ $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
+    // 'middleware' => 'check-signature-url-expiration',
 ], function ($router) {
     require __DIR__ . '/../routes/web.php';
 });
