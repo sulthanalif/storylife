@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             StatusSeeder::class,
             ServiceSeeder::class,
+            SosmedSeeder::class,
         ]);
     }
 }

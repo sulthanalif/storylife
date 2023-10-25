@@ -23,4 +23,8 @@ class Status extends Model
     {
         return $this->belongsTo(Service::class);
     }
+    public function sosmed() 
+    {
+        return $this->belongsTo(Sosmed::class);
+    }
 }

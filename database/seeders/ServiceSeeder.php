@@ -19,32 +19,32 @@ class ServiceSeeder extends Seeder
             [
                 'name' => 'Peweding',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => NULL,
+                'image' => 'upload/service.jpg',
             ],
             [
                 'name' => 'Weding',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => NULL,
+                'image' => 'upload/service.jpg',
             ],
             [
                 'name' => 'Hunting',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => NULL,
+                'image' => 'upload/service.jpg',
             ],
             [
                 'name' => 'Sport',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => NULL,
+                'image' => 'upload/service.jpg',
             ],
             [
                 'name' => 'Graduation',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => NULL,
+                'image' => 'upload/service.jpg',
             ],
             [
                 'name' => 'Birthday',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => NULL,
+                'image' => 'upload/service.jpg',
             ],
         ];
 
