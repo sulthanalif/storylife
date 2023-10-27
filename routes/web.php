@@ -69,7 +69,29 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->delete('user/{id}', ['uses' => 'UserController@destroy']);
     
         $router->get('cekcek', ['uses', 'UserController@cek']);
+        //category
+        $router->get('category', ['uses' => 'CategoryController@index']);
+    
+        $router->get('category/{id}', ['uses' => 'CategoryController@show']);
+    
+        $router->post('category', ['uses' => 'CategoryController@store']);
+    
+        $router->put('category/{id}', ['uses' => 'CategoryController@update']);
+    
+        $router->delete('category/{id}', ['uses' => 'CategoryController@destroy']);
+        //review
+        $router->get('review', ['uses' => 'ReviewController@index']);
+    
+        $router->get('review/{id}', ['uses' => 'ReviewController@show']);
+    
+        $router->post('review', ['uses' => 'ReviewController@store']);
+    
+        $router->put('review/{id}', ['uses' => 'ReviewController@update']);
+    
+        $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
     });
+    
+    $router->get('review/test', ['uses' => 'ReviewController@test']);
 
     });
     
@@ -78,28 +100,8 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
 
 
-    //category
-    $router->get('category', ['uses' => 'CategoryController@index']);
-
-    $router->get('category/{id}', ['uses' => 'CategoryController@show']);
-
-    $router->post('category', ['uses' => 'CategoryController@store']);
-
-    $router->put('category/{id}', ['uses' => 'CategoryController@update']);
-
-    $router->delete('category/{id}', ['uses' => 'CategoryController@destroy']);
 
 
-    //review
-    $router->get('review', ['uses' => 'ReviewController@index']);
-
-    $router->get('review/{id}', ['uses' => 'ReviewController@show']);
-
-    $router->post('review', ['uses' => 'ReviewController@store']);
-
-    $router->put('review/{id}', ['uses' => 'ReviewController@update']);
-
-    $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
 
 
 

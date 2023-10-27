@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Status;
 use App\Models\Service;
+use App\Helpers\EncodeFile;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class ServiceSeeder extends Seeder
@@ -15,41 +17,45 @@ class ServiceSeeder extends Seeder
     public function run(): void
     {
         $status = Status::where('name', 'Active')->first();
+        $imagePath = base_path('public/upload/service.jpg');
+
+        // if (File::exists($imagePath)) {
+        //     $imageName = basename($imagePath);
+        //     $imageData = EncodeFile::encodeFile($imageName);
+        // } else {
+        //     $imageData = null; 
+        // }
+
         $services = [
             [
                 'name' => 'Peweding',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => 'upload/service.jpg',
             ],
             [
                 'name' => 'Weding',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => 'upload/service.jpg',
             ],
             [
                 'name' => 'Hunting',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => 'upload/service.jpg',
             ],
             [
                 'name' => 'Sport',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => 'upload/service.jpg',
             ],
             [
                 'name' => 'Graduation',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => 'upload/service.jpg',
             ],
             [
                 'name' => 'Birthday',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga dignissimos, ratione excepturi maiores repellendus minus commodi eum earum vitae ullam voluptates. Ratione, culpa id! Molestias deleniti ipsa adipisci nostrum blanditiis.',
-                'image' => 'upload/service.jpg',
             ],
         ];
 
         foreach ($services as $service) {
             $service['status_id'] = $status->id;
+            $service['image'] = $imagePath;
             Service::create($service);
         }
     }
