@@ -22,6 +22,9 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->post('/register', 'AuthController@register');
     $router->post('/login', 'AuthController@login');
     $router->get('/gallery/get-list', 'GalleryController@getList');
+    $router->get('/review', ['uses' => 'ReviewController@index']);
+    $router->get('/category', ['uses' => 'CategoryController@index']);
+
 
     $router->group(['middleware' => 'auth'], function () use ($router) {
         $router->post('/logout', 'AuthController@logout');
@@ -70,7 +73,6 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         $router->get('cekcek', ['uses', 'UserController@cek']);
         //category
-        $router->get('category', ['uses' => 'CategoryController@index']);
 
         $router->get('category/{id}', ['uses' => 'CategoryController@show']);
 
@@ -89,7 +91,6 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
     });
-    $router->get('review', ['uses' => 'ReviewController@index']);
 });
 
 
