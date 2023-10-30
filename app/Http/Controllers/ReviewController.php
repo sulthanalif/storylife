@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Review;
-use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
+use App\Models\Review;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+//    public function __construct()
+//    {
+//        $this->middleware('auth');
+//    }
 
     /**
      * Display a listing of the resource.
@@ -44,7 +44,7 @@ class ReviewController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -92,7 +92,7 @@ class ReviewController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Review  $review
+     * @param \App\Models\Review $review
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -110,7 +110,7 @@ class ReviewController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Review  $review
+     * @param \App\Models\Review $review
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -128,8 +128,8 @@ class ReviewController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Review  $review
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Review $review
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -184,7 +184,7 @@ class ReviewController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Review  $review
+     * @param \App\Models\Review $review
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

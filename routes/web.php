@@ -30,14 +30,14 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->post('gallery', ['uses' => 'GalleryController@store']);
         $router->put('gallery/{id}', ['uses' => 'GalleryController@update']);
         $router->delete('gallery/{id}', ['uses' => 'GalleryController@destroy']);
-        
+
         //status
-       $router->get('status', ['uses' => 'StatusController@index']);
-       $router->get('status/{id}', ['uses' => 'StatusController@show']);
-       $router->post('status', ['uses' => 'StatusController@store']);
-       $router->put('status/{id}', ['uses' => 'StatusController@update']);
-       $router->delete('status/{id}', ['uses' => 'StatusController@destroy']); 
-       $router->put('status/{id}', ['uses' => 'StatusController@restore']);
+        $router->get('status', ['uses' => 'StatusController@index']);
+        $router->get('status/{id}', ['uses' => 'StatusController@show']);
+        $router->post('status', ['uses' => 'StatusController@store']);
+        $router->put('status/{id}', ['uses' => 'StatusController@update']);
+        $router->delete('status/{id}', ['uses' => 'StatusController@destroy']);
+        $router->put('status/{id}', ['uses' => 'StatusController@restore']);
         // $router->group(['middleware' => 'check-signature-url-expiration'], function () use ($router) {
         //     $router->get('/form', 'ExampleController@form');
         // });
@@ -54,49 +54,48 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         //user
         $router->get('user', ['uses' => 'UserController@index']);
-    
+
         $router->get('user/{id}', ['uses' => 'UserController@show']);
-    
+
         $router->post('user', ['uses' => 'UserController@store']);
-    
+
         $router->put('user/profile/{id}', [
             'uses' => 'UserController@updateProfile',
-            'as' => 'profile'           
+            'as' => 'profile'
         ]);
-    
+
         $router->put('user/password/{id}', ['uses' => 'UserController@updatePass', 'as' => 'password']);
-    
+
         $router->delete('user/{id}', ['uses' => 'UserController@destroy']);
-    
+
         $router->get('cekcek', ['uses', 'UserController@cek']);
         //category
         $router->get('category', ['uses' => 'CategoryController@index']);
-    
+
         $router->get('category/{id}', ['uses' => 'CategoryController@show']);
-    
+
         $router->post('category', ['uses' => 'CategoryController@store']);
-    
+
         $router->put('category/{id}', ['uses' => 'CategoryController@update']);
-    
+
         $router->delete('category/{id}', ['uses' => 'CategoryController@destroy']);
         //review
         $router->get('review', ['uses' => 'ReviewController@index']);
-    
+
         $router->get('review/{id}', ['uses' => 'ReviewController@show']);
-    
+
         $router->post('review', ['uses' => 'ReviewController@store']);
-    
+
         $router->put('review/{id}', ['uses' => 'ReviewController@update']);
-    
+
         $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
     });
-    
-    $router->get('review/test', ['uses' => 'ReviewController@test']);
 
-    });
-    
-    
-   
+    $router->get('review/test', ['uses' => 'ReviewController@test']);
+});
+
+
+
 
 
 
