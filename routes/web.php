@@ -80,7 +80,6 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         $router->delete('category/{id}', ['uses' => 'CategoryController@destroy']);
         //review
-        $router->get('review', ['uses' => 'ReviewController@index']);
 
         $router->get('review/{id}', ['uses' => 'ReviewController@show']);
 
@@ -90,8 +89,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
     });
-
-    $router->get('review/test', ['uses' => 'ReviewController@test']);
+    $router->get('review', ['uses' => 'ReviewController@index']);
 });
 
 
