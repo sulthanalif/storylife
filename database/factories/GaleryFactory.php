@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
 use App\Models\Galery;
 use Illuminate\Database\Eloquent\Factories\Factory;
+// use Illuminate\Support\Testing\Fakes\Fake;
 
 class GaleryFactory extends Factory
 {
@@ -11,8 +13,8 @@ class GaleryFactory extends Factory
 
     public function definition(): array
     {
-    	return [
-    	    //
-    	];
+        return [
+            //
+        ];
     }
 }

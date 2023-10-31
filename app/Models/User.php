@@ -17,7 +17,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 {
     use Authenticatable, Authorizable, HasFactory, UUIDGenerator, SoftDeletes;
 
-    
+    protected $table = 'users'; // Specify the table name
+    protected $keyType = 'string';
+    protected $primaryKey = 'id';
+    public $incrementing = false;
 
     public function getJWTIdentifier()
     {
@@ -35,7 +38,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var string[]
      */
     protected $fillable = [
-        'name', 'email', 'password', 'api_token'
+        'name', 'email', 'password'
     ];
 
     /**
@@ -44,12 +47,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var string[]
      */
     protected $hidden = [
-        'password', 'api_token',
+        'password'
     ];
 
     public function reviews()
     {
-        return $this->hasMany(Review::class);
+        return $this->belongsTo(Review::class);
     }
 }
 

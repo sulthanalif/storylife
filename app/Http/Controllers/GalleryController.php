@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ResponseFormatter;
 use App\Models\Gallery;
+use App\Helpers\EncodeFile;
 use Illuminate\Http\Request;
+use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\Validator;
 
 class GalleryController extends Controller
@@ -69,22 +70,15 @@ class GalleryController extends Controller
         $tittle = $request->input('tittle');
         $description = $request->input('description');
         $category_id = $request->input('category_id');
-        $file = $request->file('file')->getClientOriginalName();
-
-        //memindahkan file ke repo
-        $upload = $request->file('file')->move('upload', $file);
-
-        //cek apakah bisa atau tidak
-        if (!$upload) {
-            return ResponseFormatter::error('', 'File Tidak Dapat Diupload!');
-        }
+        $file = $request->file('image');
+        $imageData = EncodeFile::encodeFile($file);
 
         //simpan
         $galleries = Gallery::create([
             'tittle' => $tittle,
             'description' => $description,
             'category_id' => $category_id,
-            'file' => $file
+            'image' => $imageData
         ]);
 
         if ($galleries) {
@@ -157,24 +151,13 @@ class GalleryController extends Controller
         $tittle = $request->input('tittle');
         $description = $request->input('description');
         $category_id = $request->input('category_id');
-        $file = $request->file('file')->getClientOriginalName();
-
-        //memindahkan file ke repo
-        $upload = $request->file('file')->move('upload', $file);
-
-        //cek apakah bisa atau tidak
-        if (!$upload) {
-            return ResponseFormatter::error('', 'File Tidak Dapat Diupload!');
-        }
+        $file = $request->file('image');
+        $imageData = EncodeFile::encodeFile($file);
 
         //cari data
         $gallery = Gallery::where('id', $id)->first();
 
-        //hapus file lama
-        $fileToDelete = base_path('public/upload/' . $gallery->file);
-        if (file_exists($fileToDelete)) {
-            unlink($fileToDelete);
-        }
+    
 
         //validasi gallery
         if ($gallery) {
@@ -182,7 +165,7 @@ class GalleryController extends Controller
                 'tittle' => $tittle,
                 'description' => $description,
                 'category_id' => $category_id,
-                'file' => $file
+                'image' => $imageData
             ]);
 
             //validasi update

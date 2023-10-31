@@ -23,11 +23,11 @@ class Category extends Model
 
     public function galleries()
     {
-        return $this->hasMany(Gallery::class);
+        return $this->belongsTo(Gallery::class);
     }
 
     public function reviews()
     {
-        return $this->hasMany(Review::class);
+        return $this->belongsTo(Review::class);
     }
 }

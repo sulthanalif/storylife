@@ -21,11 +21,11 @@ class Review extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOne(User::class);
     }
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->hasOne(Category::class);
     }
 }

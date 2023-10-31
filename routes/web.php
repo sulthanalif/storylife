@@ -24,6 +24,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->get('/gallery/get-list', 'GalleryController@getList');
     $router->get('/review', ['uses' => 'ReviewController@index']);
     $router->get('/category', ['uses' => 'CategoryController@index']);
+    $router->get('/dashboard', ['uses' => 'DashboardController@index']);
 
 
     $router->group(['middleware' => 'auth'], function () use ($router) {

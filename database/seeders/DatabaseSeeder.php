@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+// use App\Models\Gallery;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -20,6 +21,8 @@ class DatabaseSeeder extends Seeder
             StatusSeeder::class,
             ServiceSeeder::class,
             SosmedSeeder::class,
+            ReviewSeeder::class,
+            GalerySeeder::class,
         ]);
     }
 }
