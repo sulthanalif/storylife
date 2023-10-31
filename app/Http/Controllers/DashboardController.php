@@ -17,9 +17,7 @@ class DashboardController extends Controller
             return ResponseFormatter::error('', 'Error');
         }
 
-        return ResponseFormatter::success([
-            $cek,
-        ], 'Success');
+        return ResponseFormatter::success( $cek, 'Success');
         
     }
 }
