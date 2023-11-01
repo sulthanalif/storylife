@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Gallery;
 use App\Helpers\EncodeFile;
-use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
+use App\Models\Gallery;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class GalleryController extends Controller
@@ -60,35 +61,39 @@ class GalleryController extends Controller
         ];
 
         // Melakukan validasi
-        $validator = Validator::make($request->all(), $rules);   
+        $validator = Validator::make($request->all(), $rules);
 
         // Cek apakah validasi gagal
         if ($validator->fails()) {
             return ResponseFormatter::error('', 'Validasi Gagal');
         }
 
-        $tittle = $request->input('tittle');
-        $description = $request->input('description');
-        $category_id = $request->input('category_id');
-        $file = $request->file('image');
-        $imageData = $file->getClientOriginalName();
-        $image = EncodeFile::encodeFile($imageData);
-
-        // Simpan file dengan nama yang sudah dikodekan ke direktori public/upload
-        $file->move(base_path('public/upload'), $image);
-
-        //simpan
-        $galleries = Gallery::create([
-            'tittle' => $tittle,
-            'description' => $description,
-            'category_id' => $category_id,
-            'image' => $image
-        ]);
-
-        if ($galleries) {
-            return ResponseFormatter::success($galleries, 'Data Berhasil Disimpan');
-        } else {
-            return ResponseFormatter::error('', 'Data Gagal Disimpan');
+        try {
+            DB::transaction(function () use ($request, &$galleries) {
+                $tittle = $request->input('tittle');
+                $description = $request->input('description');
+                $category_id = $request->input('category_id');
+                $file = $request->file('image');
+                // mendapatkan original extensionnya
+                $imageData = $file->getClientOriginalExtension();
+                //membuat nama file dengan epochtime
+                $image = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData;
+                $galleries = Gallery::create([
+                    'tittle' => $tittle,
+                    'description' => $description,
+                    'category_id' => $category_id,
+                    'image' => $image
+                ]);
+                // Simpan file dengan nama yang sudah dikodekan ke direktori public/upload
+                $file->move(base_path('public/upload'), $image);
+            });
+            if ($galleries) {
+                return ResponseFormatter::success($galleries, 'Data Berhasil Disimpan');
+            } else {
+                return ResponseFormatter::error('', 'Data Gagal Disimpan');
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('', 'Terjadi Kesalahan Sistem');
         }
     }
 
@@ -101,10 +106,17 @@ class GalleryController extends Controller
      */
     public function show($id)
     {
-        $gallery = Gallery::find($id);
-
+        $gallery = Gallery::with('category')->where('id', $id)->first();
         if ($gallery) {
-            return ResponseFormatter::success($gallery, 'Data Ditemukan');
+            $data = [
+                'id' => $gallery->id,
+                'category' => $gallery->category->name,
+                'title' => $gallery->title,
+                'description' => $gallery->description,
+                //membuat image menjadi encode agar directory file tidak di temukan
+                'image' => EncodeFile::encodeFile(base_path('public/upload/' . $gallery->image)),
+            ];
+            return ResponseFormatter::success($data, 'Data Ditemukan');
         } else {
             return ResponseFormatter::error('', 'Data Tidak Ditemukan');
         }
@@ -161,7 +173,6 @@ class GalleryController extends Controller
         //cari data
         $gallery = Gallery::where('id', $id)->first();
 
-    
 
         //validasi gallery
         if ($gallery) {

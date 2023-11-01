@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\File;
 
 class EncodeFile
 {
-    public static function encodeFile($file): string
+    public static function encodeFile($file)
     {
         $base64Image = base64_encode(file_get_contents($file));
         $mimeType = File::mimeType($file);
