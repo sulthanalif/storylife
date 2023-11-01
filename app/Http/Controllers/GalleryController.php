@@ -56,11 +56,11 @@ class GalleryController extends Controller
             'tittle' => 'required|string',
             'description' => 'required|string',
             'category_id' => 'required',
-            'image' => 'required',
+            'image' => 'required|image',
         ];
 
         // Melakukan validasi
-        $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules);   
 
         // Cek apakah validasi gagal
         if ($validator->fails()) {
@@ -71,14 +71,18 @@ class GalleryController extends Controller
         $description = $request->input('description');
         $category_id = $request->input('category_id');
         $file = $request->file('image');
-        $imageData = EncodeFile::encodeFile($file);
+        $imageData = $file->getClientOriginalName();
+        $image = EncodeFile::encodeFile($imageData);
+
+        // Simpan file dengan nama yang sudah dikodekan ke direktori public/upload
+        $file->move(base_path('public/upload'), $image);
 
         //simpan
         $galleries = Gallery::create([
             'tittle' => $tittle,
             'description' => $description,
             'category_id' => $category_id,
-            'image' => $imageData
+            'image' => $image
         ]);
 
         if ($galleries) {
@@ -133,19 +137,19 @@ class GalleryController extends Controller
     public function update(Request $request, $id)
     {
         //rules
-        // $rules = [
-        //     'tittle' => 'required|string',
-        //     'description' => 'required|string',
-        //     'category_id' => 'required',
-        //     'file' => 'required',
-        // ];
+        $rules = [
+            'tittle' => 'required|string',
+            'description' => 'required|string',
+            'category_id' => 'required',
+            'image' => 'required',
+        ];
 
-        // // Melakukan validasi
-        // $validator = Validator::make($request->all(), $rules);
+        // Melakukan validasi
+        $validator = Validator::make($request->all(), $rules);
 
-        // if ($validator->fails()) {
-        //     return ResponseFormatter::error($validator->errors(), 'Validasi Gagal');
-        // }
+        if ($validator->fails()) {
+            return ResponseFormatter::error($validator->errors(), 'Validasi Gagal');
+        }
 
         //ambil data
         $tittle = $request->input('tittle');

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('category_id')->nullable();
             $table->string('tittle');
             $table->text('description');
-            $table->binary('image');
+            $table->text('image');
             $table->softDeletes();
             $table->timestamps();
 

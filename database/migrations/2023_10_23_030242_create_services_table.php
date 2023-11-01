@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('description')->nullable();
-            $table->binary('image')->nullable();
+            $table->text('image')->nullable();
             $table->uuid('status_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
