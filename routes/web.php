@@ -25,6 +25,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->get('/review', ['uses' => 'ReviewController@index']);
     $router->get('/category', ['uses' => 'CategoryController@index']);
     $router->get('/dashboard', ['uses' => 'DashboardController@index']);
+    $router->get('service', ['uses' => 'ServiceController@index']);
 
 
     $router->group(['middleware' => 'auth'], function () use ($router) {
@@ -47,7 +48,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         // });
 
         //service
-        $router->get('service', ['uses' => 'ServiceController@index']);
+        
         $router->get('service/form', ['uses' => 'ServiceController@create']);
         $router->post('service', ['uses' => 'ServiceController@store']);
         $router->get('service/{id}', ['uses' => 'ServiceController@show']);

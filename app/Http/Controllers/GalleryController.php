@@ -56,7 +56,7 @@ class GalleryController extends Controller
             'tittle' => 'required|string',
             'description' => 'required|string',
             'category_id' => 'required',
-            'file' => 'required',
+            'image' => 'required',
         ];
 
         // Melakukan validasi
