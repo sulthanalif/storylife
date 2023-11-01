@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\EncodeFile;
-use App\Helpers\ResponseFormatter;
 use App\Models\Gallery;
+use App\Helpers\EncodeFile;
 use Illuminate\Http\Request;
+use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+
+// use function Laravel\Prompts\select;
 
 class GalleryController extends Controller
 {
@@ -24,10 +27,33 @@ class GalleryController extends Controller
 
     public function index()
     {
-        $galleries = Gallery::all();
+        $galleries = Gallery::with('category')->get();
+
+        $data = $galleries->map(function ($gallery) {
+            return [
+                'id' => $gallery->id,
+                'category' => $gallery->category->name,
+                'tittle' => $gallery->tittle,
+                'description' => $gallery->description,
+                'image' => EncodeFile::encodeFile(base_path('public/upload/'.$gallery->image)),
+            ];
+        });
+
 
         if ($galleries) {
-            return ResponseFormatter::success($galleries, 'Berhasil Menampilkan Data Gallery');
+            // $data = [];
+
+            // foreach ($galleries as $gallery) {
+            //     $data[] = [
+            //         'id' => $gallery->id,
+            //         'category' => $gallery->category->name,
+            //         'title' => $gallery->title,
+            //         'description' => $gallery->description,
+            //         'image' => EncodeFile::encodeFile(base_path('public/upload/'. $gallery->image))
+            //     ];
+            // }
+
+            return ResponseFormatter::success($data, 'Berhasil Menampilkan Data Gallery');
         } else {
             return ResponseFormatter::error('', 'Gagal mengambil Data');
         }
@@ -111,7 +137,7 @@ class GalleryController extends Controller
             $data = [
                 'id' => $gallery->id,
                 'category' => $gallery->category->name,
-                'title' => $gallery->title,
+                'tittle' => $gallery->tittle,
                 'description' => $gallery->description,
                 //membuat image menjadi encode agar directory file tidak di temukan
                 'image' => EncodeFile::encodeFile(base_path('public/upload/' . $gallery->image)),
@@ -130,10 +156,17 @@ class GalleryController extends Controller
      */
     public function edit($id)
     {
-        $gallery = Gallery::find($id);
-
+        $gallery = Gallery::with('category')->where('id', $id)->first();
         if ($gallery) {
-            return ResponseFormatter::success($gallery, 'Data Ditemukan');
+            $data = [
+                'id' => $gallery->id,
+                'category' => $gallery->category->name,
+                'tittle' => $gallery->tittle,
+                'description' => $gallery->description,
+                //membuat image menjadi encode agar directory file tidak di temukan
+                'image' => EncodeFile::encodeFile(base_path('public/upload/' . $gallery->image)),
+            ];
+            return ResponseFormatter::success($data, 'Data Ditemukan');
         } else {
             return ResponseFormatter::error('', 'Data Tidak Ditemukan');
         }
@@ -163,34 +196,46 @@ class GalleryController extends Controller
             return ResponseFormatter::error($validator->errors(), 'Validasi Gagal');
         }
 
-        //ambil data
-        $tittle = $request->input('tittle');
-        $description = $request->input('description');
-        $category_id = $request->input('category_id');
-        $file = $request->file('image');
-        $imageData = EncodeFile::encodeFile($file);
-
-        //cari data
-        $gallery = Gallery::where('id', $id)->first();
 
 
-        //validasi gallery
-        if ($gallery) {
-            $update = $gallery->update([
-                'tittle' => $tittle,
-                'description' => $description,
-                'category_id' => $category_id,
-                'image' => $imageData
-            ]);
+        try {
+            DB::transaction(function () use ($request, $id, &$galleries) {
+                $gallery = Gallery::where('id', $id)->first();
 
-            //validasi update
-            if ($update) {
-                return ResponseFormatter::success($update, 'Data Berhasil Diubah');
+                if (!$gallery) {
+                    return ResponseFormatter::error('', 'Data tidak ditemukan');
+                }
+
+                $delete = File::delete(base_path('public/upload/' . $gallery->image));
+
+                if(!$delete) {
+                    return ResponseFormatter::error('', 'Image Tidak Terhapus');
+                }
+
+                $tittle = $request->input('tittle');
+                $description = $request->input('description');
+                $category_id = $request->input('category_id');
+                $file = $request->file('image');
+                // mendapatkan original extensionnya
+                $imageData = $file->getClientOriginalExtension();
+                //membuat nama file dengan epochtime
+                $image = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData;
+                $galleries = $gallery->update([
+                    'tittle' => $tittle,
+                    'description' => $description,
+                    'category_id' => $category_id,
+                    'image' => $image
+                ]);
+                // Simpan file dengan nama yang sudah dikodekan ke direktori public/upload
+                $file->move(base_path('public/upload'), $image);
+            });
+            if ($galleries) {
+                return ResponseFormatter::success($galleries, 'Data Berhasil Disimpan');
             } else {
-                return ResponseFormatter::error('', 'Data Gagal Diubah');
+                return ResponseFormatter::error('', 'Data Gagal Disimpan');
             }
-        } else {
-            return ResponseFormatter::error('', 'Data Tidak Ditemukan');
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('', 'Terjadi Kesalahan Sistem');
         }
     }
 

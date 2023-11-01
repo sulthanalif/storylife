@@ -15,7 +15,7 @@ class GalerySeeder extends Seeder
     public function run(): void
     {
         $category = Category::where('name', 'Hunting')->first();
-        $imagePath = base_path('public/upload/service.jpg');
+        $imagePath = 'service.jpg';
 
     	$datas = [
             [
