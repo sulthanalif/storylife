@@ -17,7 +17,7 @@ class ServiceSeeder extends Seeder
     public function run(): void
     {
         $status = Status::where('name', 'Active')->first();
-        $imagePath = base_path('public/upload/service.jpg');
+        $imagePath = 'service.jpg';
 
         // if (File::exists($imagePath)) {
         //     $imageName = basename($imagePath);

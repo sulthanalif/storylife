@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Status;
 use App\Models\Gallery;
+use App\Models\Category;
 use App\Helpers\EncodeFile;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
@@ -27,12 +29,13 @@ class GalleryController extends Controller
 
     public function index()
     {
-        $galleries = Gallery::with('category')->get();
+        $galleries = Gallery::with('category', 'status')->get();
 
         $data = $galleries->map(function ($gallery) {
             return [
                 'id' => $gallery->id,
                 'category' => $gallery->category->name,
+                'status' => $gallery->status->name,
                 'tittle' => $gallery->tittle,
                 'description' => $gallery->description,
                 'image' => EncodeFile::encodeFile(base_path('public/upload/'.$gallery->image)),
@@ -67,7 +70,16 @@ class GalleryController extends Controller
      */
     public function create()
     {
-        return ResponseFormatter::success('', 'Menampilkan Halaman Form Gallery');
+        $status = Status::select('id', 'name')->get();
+        
+        $category = Category::select('id', 'name')->get();
+
+        $data = [
+            'status' => $status,
+            'category' => $category
+        ];
+
+        return ResponseFormatter::success($data, 'Menampilkan Halaman Form Gallery');
     }
 
     /**
@@ -83,6 +95,7 @@ class GalleryController extends Controller
             'tittle' => 'required|string',
             'description' => 'required|string',
             'category_id' => 'required',
+            'status_id' => 'required',
             'image' => 'required|image',
         ];
 
@@ -99,6 +112,7 @@ class GalleryController extends Controller
                 $tittle = $request->input('tittle');
                 $description = $request->input('description');
                 $category_id = $request->input('category_id');
+                $status_id = $request->input('status_id');
                 $file = $request->file('image');
                 // mendapatkan original extensionnya
                 $imageData = $file->getClientOriginalExtension();
@@ -108,6 +122,7 @@ class GalleryController extends Controller
                     'tittle' => $tittle,
                     'description' => $description,
                     'category_id' => $category_id,
+                    'status_id' => $status_id,
                     'image' => $image
                 ]);
                 // Simpan file dengan nama yang sudah dikodekan ke direktori public/upload
@@ -132,11 +147,12 @@ class GalleryController extends Controller
      */
     public function show($id)
     {
-        $gallery = Gallery::with('category')->where('id', $id)->first();
+        $gallery = Gallery::with('category', 'status')->where('id', $id)->first();
         if ($gallery) {
             $data = [
                 'id' => $gallery->id,
                 'category' => $gallery->category->name,
+                'status' => $gallery->status->name,
                 'tittle' => $gallery->tittle,
                 'description' => $gallery->description,
                 //membuat image menjadi encode agar directory file tidak di temukan
@@ -156,15 +172,21 @@ class GalleryController extends Controller
      */
     public function edit($id)
     {
-        $gallery = Gallery::with('category')->where('id', $id)->first();
+        $gallery = Gallery::with('category', 'status')->where('id', $id)->first();
         if ($gallery) {
             $data = [
                 'id' => $gallery->id,
-                'category' => $gallery->category->name,
+                'category' => [
+                    'id' => $gallery->category->id,
+                    'name' => $gallery->category->name
+                ],
+                'status' => [
+                    'id' => $gallery->status->id,
+                    'name' => $gallery->status->name
+                ],
                 'tittle' => $gallery->tittle,
                 'description' => $gallery->description,
-                //membuat image menjadi encode agar directory file tidak di temukan
-                'image' => EncodeFile::encodeFile(base_path('public/upload/' . $gallery->image)),
+                'image' => EncodeFile::encodeFile(base_path('public/upload/'.$gallery->image)),
             ];
             return ResponseFormatter::success($data, 'Data Ditemukan');
         } else {
@@ -186,6 +208,7 @@ class GalleryController extends Controller
             'tittle' => 'required|string',
             'description' => 'required|string',
             'category_id' => 'required',
+            'status_id' => 'required',
             'image' => 'required',
         ];
 
@@ -266,10 +289,21 @@ class GalleryController extends Controller
 
     public function getList()
     {
-        $galleries = Gallery::all();
+        $galleries = Gallery::with('category', 'status')->get();
 
-        if ($galleries) {
-            return ResponseFormatter::success($galleries, 'Berhasil Menampilkan Data Gallery');
+        $data = $galleries->map(function ($gallery) {
+            return [
+                'id' => $gallery->id,
+                'category' => $gallery->category->name,
+                'status' => $gallery->status->name,
+                'tittle' => $gallery->tittle,
+                'description' => $gallery->description,
+                'image' => EncodeFile::encodeFile(base_path('public/upload/'.$gallery->image)),
+            ];
+        });
+
+        if ($data) {
+            return ResponseFormatter::success($data, 'Berhasil Menampilkan Data Gallery');
         } else {
             return ResponseFormatter::error('', 'Gagal mengambil Data');
         }

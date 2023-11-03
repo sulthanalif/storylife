@@ -27,4 +27,8 @@ class Status extends Model
     {
         return $this->belongsTo(Sosmed::class);
     }
+    public function gallery() 
+    {
+        return $this->belongsTo(Gallery::class);
+    }
 }

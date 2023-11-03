@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('galleries', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('category_id')->nullable();
+            $table->uuid('status_id')->nullable();
             $table->string('tittle');
             $table->text('description');
             $table->string('image');
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('category_id')->references('id')->on('categories');
+            $table->foreign('status_id')->references('id')->on('statuses');
         });
     }
 

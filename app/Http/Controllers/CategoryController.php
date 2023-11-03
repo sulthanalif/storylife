@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ResponseFormatter;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Helpers\ResponseFormatter;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
@@ -22,13 +23,21 @@ class CategoryController extends Controller
     public function index()
     {
         //ambil data category
-        $category = Category::all();
+        $categories = Category::all();
+
+        $data = $categories->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'description' => $category->description
+            ];
+        });
 
         //kalo kosong
-        if ($category->isEmpty()) {
+        if ($data->isEmpty()) {
             return ResponseFormatter::error('', 'Tidak Ada Data');
         } else {
-            return ResponseFormatter::success($category, 'Berhasil Menampilkan Data!');
+            return ResponseFormatter::success($data, 'Berhasil Menampilkan Data!');
         }
 
     }
@@ -62,24 +71,33 @@ class CategoryController extends Controller
 
         if ($validator->fails()) {
             return ResponseFormatter::error('', 'Validasi Gagal');
+        }  
+
+        try {
+            DB::transaction(function () use ($request, &$categories) {
+                //ambil data
+                $name = $request->input('name');
+                $description = $request->input('description');
+                
+                //tambah data
+                $categories = Category::create([
+                    'name' => $name,
+                    'description' => $description
+                ]);
+            });
+
+            if($categories) {
+                return ResponseFormatter::success($categories, 'Data Berhasil Disimpan');
+            } else {
+                return ResponseFormatter::error('', 'Data Gagal Disimpan');
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('', 'Terjadi Kesalahan Pada Sistem');
         }
 
-        //ambil data
-        $name = $request->input('name');
-        $description = $request->input('description');
 
-        //tambah data
-        $category = Category::create([
-            'name' => $name,
-            'description' => $description
-        ]);
 
-        //validasi proses tambah
-        if ($category) {
-            return ResponseFormatter::success($category, 'Data Berhasil Ditambah');
-        } else {
-            return ResponseFormatter::error('', 'Gagal Menambah Data');
-        }
+        
 
     }
 
@@ -91,7 +109,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        $category = Category::find($id);
+        $category = Category::where('id',$id)->select('id', 'name', 'description')->first();
 
         if ($category) {
             return ResponseFormatter::success($category, 'Data Berhasil Ditemukan!');
@@ -108,7 +126,7 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        $category = Category::find($id);
+        $category = Category::where('id',$id)->select('id', 'name', 'description')->first();
 
         if ($category) {
             return ResponseFormatter::success($category, 'Data Berhasil Ditemukan!');
@@ -139,29 +157,36 @@ class CategoryController extends Controller
             return ResponseFormatter::error('', 'Validasi Gagal');
         }
 
-        //ambil data
-        $name = $request->input('name');
-        $description = $request->input('description');
+        try {
+            DB::transaction(function () use ($request, $id, &$categories, &$update) {
+                //ambil data
+                $name = $request->input('name');
+                $description = $request->input('description');
+                
+                //cari data yg mau di update
+                $categories = Category::find($id);
 
-        //cari data yg mau di update
-        $category = Category::find($id);
-
-        if ($category) {
-            //tambah data
-            $update = $category->update([
+                 //tambah data
+                $update = $categories->update([
                 'name' => $name,
                 'description' => $description
-            ]);
+                ]);
+            });
 
-            //validasi proses tambah
-            if ($update) {
-                return ResponseFormatter::success($category, 'Data Berhasil Ditambah');
+            if($update) {
+                return ResponseFormatter::success($categories, 'Data Berhasil Disimpan');
             } else {
-                return ResponseFormatter::error('', 'Gagal Menambah Data');
+                return ResponseFormatter::error('', 'Data Gagal Disimpan');
             }
-        } else {
-            return ResponseFormatter::error('', 'Data Tidak Ditemukan');
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('', 'Terjadi Kesalahan Pada Sistem');
         }
+
+
+
+        
+
+        
 
     }
 
@@ -173,7 +198,7 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $category = Category::find($id);
+        $category = Category::where($id);
 
         if ($category) {
             $category->delete();

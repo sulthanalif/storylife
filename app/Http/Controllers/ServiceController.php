@@ -9,6 +9,7 @@ use App\Helpers\EncodeFile;
 use Illuminate\Http\Request;
 
 use App\Helpers\ResponseFormatter;
+use Illuminate\Support\Facades\DB;
 use function PHPUnit\Framework\isEmpty;
 use Illuminate\Support\Facades\Validator;
 
@@ -23,13 +24,24 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $services = Service::all();
+        $services = Service::with('status')->get();
 
-        if ($services->isEmpty()) {
+        $data = $services->map(function ($service) {
+            return [
+                'id' => $service->id,
+                'status' => $service->status->name,
+                'name' => $service->name,
+                'description' => $service->description,
+                'image' => EncodeFile::encodeFile(base_path('public/upload/'. $service->image))
+                // 'image' => $service->image
+            ];
+        });
+
+        if ($data->isEmpty()) {
             return ResponseFormatter::error('', 'Belum Ada Data Pelayanan');
         }
 
-        return ResponseFormatter::success($services, 'Data Berhasil Ditemukan');
+        return ResponseFormatter::success($data, 'Data Berhasil Ditemukan');
     }
 
     /**
@@ -64,24 +76,38 @@ class ServiceController extends Controller
             return ResponseFormatter::error('', $validator->errors());
         }
 
-        $name = $request->input('name');
-        $description = $request->input('description');
-        $status_id = $request->input('status_id');
+        try {
+            DB::transaction(function () use ($request, &$services) {
+                $name = $request->input('name');
+                $description = $request->input('description');
+                $status_id = $request->input('status_id');
+                $file = $request->file('image');
 
-        $file = $request->file('image');
-        $imageData = EncodeFile::encodeFile($file);
-        $service = Service::create([
-            'name' => $name,
-            'description' => $description,
-            'image' => $imageData,
-            'status_id' => $status_id
-        ]);
+                $imageData = $file->getClientOriginalExtension();
 
-        if ($service) {
-            return ResponseFormatter::success($service, 'Data Berhasil Disimpan');
-        } else {
-            return ResponseFormatter::error('', 'Data Gagal Disimpan');
+                $image = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData;
+
+                $services = Service::create([
+                    'name' => $name,
+                    'description' => $description,
+                    'image' => $image,
+                    'status_id' => $status_id
+                ]);
+
+                $file->move(base_path('public/upload'), $image);
+            });
+            
+            if ($services) {
+                return ResponseFormatter::success($services, 'Data Berhasil Disimpan');
+            } else {
+                return ResponseFormatter::error('', 'Data Gagal Disimpan');
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('', 'Terjadi Kesalahan Sistem');
         }
+
+
+       
     }
 
     /**
@@ -92,13 +118,22 @@ class ServiceController extends Controller
      */
     public function show($id)
     {
-        $data = Service::find($id);
+        $service = Service::with('status')->where('id', $id)->first();
+        
 
-        if (!$data) {
-            return ResponseFormatter::error('', 'Data Tidak Ditemukan');
+        if ($service) {
+            $data = [
+                'id' => $service->id,
+                'status' => $service->status->name,
+                'name' => $service->name,
+                'description' => $service->description,
+                'image' => EncodeFile::encodeFile(base_path('public/upload/'. $service->image))
+            ];
+
+            return ResponseFormatter::success($data, 'Data Ditemukan');
         }
+        return ResponseFormatter::error('', 'Data Tidak Ditemukan');
 
-        return ResponseFormatter::success($data, 'Data Ditemukan');
     }
 
     /**

@@ -15,12 +15,17 @@ class Gallery extends Model
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $fillable = [
-        'tittle', 'description', 'category_id', 'image'
+        'tittle', 'description', 'category_id', 'status_id', 'image'
     ];
 
 
     public function category()
     {
         return $this->hasOne(Category::class, 'id', 'category_id');
+    }
+
+    public function status()
+    {
+        return $this->hasOne(Status::class, 'id', 'status_id');
     }
 }

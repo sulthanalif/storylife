@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Gallery;
 use App\Models\Category;
+use App\Models\Status;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
@@ -15,6 +16,7 @@ class GalerySeeder extends Seeder
     public function run(): void
     {
         $category = Category::where('name', 'Hunting')->first();
+        $status = Status::where('name', 'Active')->first();
         $imagePath = 'service.jpg';
 
     	$datas = [
@@ -34,6 +36,7 @@ class GalerySeeder extends Seeder
 
         foreach ($datas as $data) {
             $data['category_id'] = $category->id;
+            $data['status_id'] = $status->id;
             $data['image'] = $imagePath;
             Gallery::create($data);
         }

@@ -21,6 +21,6 @@ class Service extends Model
 
     public function status()
     {
-        return $this->hasOne(Status::class);
+        return $this->hasOne(Status::class, 'id', 'status_id');
     }
 }
