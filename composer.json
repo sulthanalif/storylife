@@ -6,9 +6,11 @@
     "type": "project",
     "require": {
         "php": "^8.1",
+        "dymantic/laravel-instagram-feed": "^3.3",
         "flipbox/lumen-generator": "^9.2",
         "intervention/image": "^2.7",
         "laravel/lumen-framework": "^10.0",
+        "laravel/socialite": "^5.10",
         "ramsey/uuid": "^4.7",
         "tymon/jwt-auth": "^2.0"
     },
