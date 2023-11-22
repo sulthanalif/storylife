@@ -287,25 +287,52 @@ class GalleryController extends Controller
         }
     }
 
-    public function getList()
+    public function getList(Request $request)
     {
-        $galleries = Gallery::with('category', 'status')->get();
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
 
-        $data = $galleries->map(function ($gallery) {
-            return [
-                'id' => $gallery->id,
-                'category' => $gallery->category->name,
-                'status' => $gallery->status->name,
-                'tittle' => $gallery->tittle,
-                'description' => $gallery->description,
-                'image' => EncodeFile::encodeFile(base_path('public/upload/'.$gallery->image)),
-            ];
-        });
-
-        if ($data) {
-            return ResponseFormatter::success($data, 'Berhasil Menampilkan Data Gallery');
+        if ($perPage === 'bypass') {
+            //bypass
+            $galleries = Gallery::with('category', 'status')->get();
+            $total = $galleries->count();
+            $data = $galleries;
         } else {
-            return ResponseFormatter::error('', 'Gagal mengambil Data');
+            //paginasi
+            $paginator = Gallery::with('category', 'status')->paginate($perPage, ['*'], 'page', $page);
+            $data = $paginator->items();
+            $total = $paginator->total();
         }
+
+        return ResponseFormatter::success([
+            'current_page' => (int)$page,
+            'data' => $data,
+            'next_page_url' => $this->getNextPageUrl($request, $page, $perPage, $total), 
+            'path' => $request->url(),
+            'per_page' => (int)$perPage,
+            'prev_page_url' => $this->getPrevPageUrl($request, $page, $perPage), 
+            'to' => (int)$page * (int)$perPage,
+            'total' => (int)$total,
+        ], 'Berhasil Menampilkan Data Gallery');
     }
+
+    protected function getNextPageUrl(Request $request, $currentPage, $perPage, $total)
+    {
+        if ($currentPage * $perPage < $total) {
+            return $request->fullUrlWithQuery(['page' => $currentPage + 1]);
+        }
+
+        return null;
+    }
+
+    protected function getPrevPageUrl(Request $request, $currentPage, $perPage)
+    {
+        if ($currentPage > 1) {
+            return $request->fullUrlWithQuery(['page' => $currentPage - 1]);
+        }
+
+        return null;
+    }
+
+    
 }
