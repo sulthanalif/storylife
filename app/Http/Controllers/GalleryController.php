@@ -293,12 +293,21 @@ class GalleryController extends Controller
         $page = $request->input('page', 1);
 
         if ($perPage === 'bypass') {
-            //bypass
+            // Jika per_page bernilai "bypass", gunakan metode bypass
             $galleries = Gallery::with('category', 'status')->get();
             $total = $galleries->count();
-            $data = $galleries;
+            $data = $galleries->map(function ($gallery) {
+                return [
+                    'id' => $gallery->id,
+                    'category' => $gallery->category->name,
+                    'status' => $gallery->status->name,
+                    'tittle' => $gallery->tittle,
+                    'description' => $gallery->description,
+                    'image' => EncodeFile::encodeFile(base_path('public/upload/'.$gallery->image)),
+                ];
+            });;
         } else {
-            //paginasi
+            // Jika per_page memiliki nilai selain "bypass", gunakan paginasi
             $paginator = Gallery::with('category', 'status')->paginate($perPage, ['*'], 'page', $page);
             $data = $paginator->items();
             $total = $paginator->total();
@@ -307,10 +316,10 @@ class GalleryController extends Controller
         return ResponseFormatter::success([
             'current_page' => (int)$page,
             'data' => $data,
-            'next_page_url' => $this->getNextPageUrl($request, $page, $perPage, $total), 
+            'next_page_url' => $perPage === 'bypass' ? null : $paginator->nextPageUrl(),
             'path' => $request->url(),
             'per_page' => (int)$perPage,
-            'prev_page_url' => $this->getPrevPageUrl($request, $page, $perPage), 
+            'prev_page_url' => $perPage === 'bypass' ? null : $paginator->previousPageUrl(),
             'to' => (int)$page * (int)$perPage,
             'total' => (int)$total,
         ], 'Berhasil Menampilkan Data Gallery');

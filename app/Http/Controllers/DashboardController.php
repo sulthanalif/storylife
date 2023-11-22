@@ -54,7 +54,7 @@ class DashboardController extends Controller
             'stat' => $stat,
             'pesananBaruSelesai' => $pesananBaruSelesai,
             'review' => $review
-        ], 'Success');
+        ], 'Success yah :)');
         
     }
 }
