@@ -85,7 +85,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
-            'user' => $user
+            'user' => $user 
         ], 'Login Berhasil!');
     }
 
@@ -99,6 +99,21 @@ class AuthController extends Controller
         } catch (\Exception $exception) {
             return ResponseFormatter::error('', 'Terjadi Kesalahan sistem', 500);
         }
+    }
+
+    public function getToken(Request $request)
+    {
+         // Dapatkan user yang di-authenticated saat ini
+         $user = Auth::user();
+
+         // Buat token untuk user
+         $token = JWTAuth::fromUser($user);
+
+        return ResponseFormatter::success([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+        ], 'Token Berhasil Diperoleh!');
     }
 
     // public function login(Request $request)

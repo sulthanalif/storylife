@@ -29,6 +29,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
     $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
         $router->post('/logout', 'AuthController@logout');
+        $router->get('/get-token', 'AuthController@getToken');
         $router->get('gallery', ['uses' => 'GalleryController@index']);
         $router->get('gallery/create', ['uses' => 'GalleryController@create ']);
         $router->get('gallery/{id}', ['uses' => 'GalleryController@show']);
