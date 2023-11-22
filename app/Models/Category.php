@@ -30,6 +30,7 @@ class Category extends Model
     {
         return $this->belongsTo(Review::class);
     }
+    
     public function order()
     {
         return $this->belongsTo(Order::class);
