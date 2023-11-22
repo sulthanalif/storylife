@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ResponseFormatter;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Helpers\ResponseFormatter;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -63,37 +64,82 @@ class AuthController extends Controller
         ];
 
         $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error('', $validator->errors()->first(), 400);
+        }
+
         $credentials = $request->only(['email', 'password']);
 
         try {
-            if ($validator->fails()) {
-                return ResponseFormatter::error('', $validator->getMessageBag(), 400);
-            }
-            if (!$token = Auth::attempt($credentials)) {
-                return response()->json(['message' => 'Email Atau Password Salah!!!'], 401);
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return ResponseFormatter::error('', 'Email atau Password Salah!', 401);
             }
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Terdapat kesalahan dalam sistem, silahkan coba lagi.'], 500);
+            return ResponseFormatter::error('', 'Terdapat kesalahan dalam sistem, silahkan coba lagi.', 500);
         }
 
         $user = User::where('email', $request->email)->first(['name', 'email']);
 
         return ResponseFormatter::success([
-            'accessToken' => $token,
+            'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::factory()->getTTL() * 60,
-            'user' => $user], 'Login Berhasil!');
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            'user' => $user
+        ], 'Login Berhasil!');
     }
 
     public function logout(Request $request)
     {
-        auth()->logout();
         try {
+            $token = JWTAuth::getToken(); // Mendapatkan token dari permintaan
+            JWTAuth::invalidate($token); // Mematikan token
+    
             return ResponseFormatter::success('', 'Logout Berhasil');
         } catch (\Exception $exception) {
-            return ResponseFormatter::error('', 'Terjadi Kesalaan sistem');
-
+            return ResponseFormatter::error('', 'Terjadi Kesalahan sistem', 500);
         }
-
     }
+
+    // public function login(Request $request)
+    // {
+    //     $rules = [
+    //         'email' => 'required|email',
+    //         'password' => 'required|string',
+    //     ];
+
+    //     $validator = Validator::make($request->all(), $rules);
+    //     $credentials = $request->only(['email', 'password']);
+
+    //     try {
+    //         if ($validator->fails()) {
+    //             return ResponseFormatter::error('', $validator->getMessageBag(), 400);
+    //         }
+    //         if (!$token = Auth::attempt($credentials)) {
+    //             return response()->json(['message' => 'Email Atau Password Salah!!!'], 401);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json(['message' => 'Terdapat kesalahan dalam sistem, silahkan coba lagi.'], 500);
+    //     }
+
+    //     $user = User::where('email', $request->email)->first(['name', 'email']);
+
+    //     return ResponseFormatter::success([
+    //         'accessToken' => $token,
+    //         'token_type' => 'bearer',
+    //         'expires_in' => Auth::factory()->getTTL() * 60,
+    //         'user' => $user], 'Login Berhasil!');
+    // }
+
+    // public function logout(Request $request)
+    // {
+    //     auth()->logout();
+    //     try {
+    //         return ResponseFormatter::success('', 'Logout Berhasil');
+    //     } catch (\Exception $exception) {
+    //         return ResponseFormatter::error('', 'Terjadi Kesalaan sistem');
+
+    //     }
+
+    // }
 }
