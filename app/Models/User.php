@@ -54,5 +54,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->belongsTo(Review::class);
     }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }
 

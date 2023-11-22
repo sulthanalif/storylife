@@ -21,15 +21,17 @@ $router->get('/', function () use ($router) {
 $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->post('/register', 'AuthController@register');
     $router->post('/login', 'AuthController@login');
+    $router->get('/order', 'OrderController@index');
     $router->get('/gallery/get-list', 'GalleryController@getList');
     $router->get('/review', ['uses' => 'ReviewController@index']);
     $router->get('/category', ['uses' => 'CategoryController@index']);
-    $router->get('/dashboard', ['uses' => 'DashboardController@index']);
     $router->get('service', ['uses' => 'ServiceController@index']);
-
+    
     $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
+        $router->get('/dashboard', ['uses' => 'DashboardController@index']);
         $router->post('/logout', 'AuthController@logout');
         $router->get('/get-token', 'AuthController@getToken');
+
         $router->get('gallery', ['uses' => 'GalleryController@index']);
         $router->get('gallery/create', ['uses' => 'GalleryController@create ']);
         $router->get('gallery/{id}', ['uses' => 'GalleryController@show']);
@@ -76,8 +78,8 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->delete('user/{id}', ['uses' => 'UserController@destroy']);
 
         $router->get('cekcek', ['uses', 'UserController@cek']);
+        
         //category
-
         $router->get('category/{id}', ['uses' => 'CategoryController@show']);
 
         $router->post('category', ['uses' => 'CategoryController@store']);
@@ -85,8 +87,8 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->post('category/{id}', ['uses' => 'CategoryController@update']);
 
         $router->delete('category/{id}', ['uses' => 'CategoryController@destroy']);
+        
         //review
-
         $router->get('review/{id}', ['uses' => 'ReviewController@show']);
 
         $router->post('review', ['uses' => 'ReviewController@store']);
@@ -94,6 +96,9 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->post('review/{id}', ['uses' => 'ReviewController@update']);
 
         $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
+
+        //order
+        
     });
 });
 

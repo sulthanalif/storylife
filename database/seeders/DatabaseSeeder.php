@@ -19,10 +19,12 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CategorySeeder::class,
             StatusSeeder::class,
+            StatusOrderSeeder::class,
             ServiceSeeder::class,
             SosmedSeeder::class,
             ReviewSeeder::class,
             GalerySeeder::class,
+            OrderSeeder::class,
         ]);
     }
 }
