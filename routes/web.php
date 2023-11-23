@@ -23,6 +23,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->post('/login', 'AuthController@login');
     $router->get('/order', 'OrderController@index');
     $router->get('/gallery/get-list', 'GalleryController@getList');
+    $router->get('/review/get-list', 'ReviewController@getList');
     $router->get('/review', ['uses' => 'ReviewController@index']);
     $router->get('/category', ['uses' => 'CategoryController@index']);
     $router->get('service', ['uses' => 'ServiceController@index']);

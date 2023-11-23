@@ -11,6 +11,7 @@ use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\PaginationHelper;
 
 // use function Laravel\Prompts\select;
 
@@ -305,7 +306,7 @@ class GalleryController extends Controller
                     'description' => $gallery->description,
                     'image' => EncodeFile::encodeFile(base_path('public/upload/'.$gallery->image)),
                 ];
-            });;
+            });
         } else {
             // Jika per_page memiliki nilai selain "bypass", gunakan paginasi
             $paginator = Gallery::with('category', 'status')->paginate($perPage, ['*'], 'page', $page);
@@ -313,35 +314,38 @@ class GalleryController extends Controller
             $total = $paginator->total();
         }
 
+        $nextPageUrl = $perPage === 'bypass' ? null : PaginationHelper::getNextPageUrl($request, $page, $perPage, $total);
+        $prevPageUrl = $perPage === 'bypass' ? null : PaginationHelper::getPrevPageUrl($request, $page, $perPage);
+
         return ResponseFormatter::success([
             'current_page' => (int)$page,
             'data' => $data,
-            'next_page_url' => $perPage === 'bypass' ? null : $paginator->nextPageUrl(),
+            'next_page_url' => $nextPageUrl,
             'path' => $request->url(),
             'per_page' => (int)$perPage,
-            'prev_page_url' => $perPage === 'bypass' ? null : $paginator->previousPageUrl(),
+            'prev_page_url' => $prevPageUrl,
             'to' => (int)$page * (int)$perPage,
             'total' => (int)$total,
         ], 'Berhasil Menampilkan Data Gallery');
     }
 
-    protected function getNextPageUrl(Request $request, $currentPage, $perPage, $total)
-    {
-        if ($currentPage * $perPage < $total) {
-            return $request->fullUrlWithQuery(['page' => $currentPage + 1]);
-        }
+    // protected function getNextPageUrl(Request $request, $currentPage, $perPage, $total)
+    // {
+    //     if ($currentPage * $perPage < $total) {
+    //         return $request->fullUrlWithQuery(['page' => $currentPage + 1]);
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
-    protected function getPrevPageUrl(Request $request, $currentPage, $perPage)
-    {
-        if ($currentPage > 1) {
-            return $request->fullUrlWithQuery(['page' => $currentPage - 1]);
-        }
+    // protected function getPrevPageUrl(Request $request, $currentPage, $perPage)
+    // {
+    //     if ($currentPage > 1) {
+    //         return $request->fullUrlWithQuery(['page' => $currentPage - 1]);
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
     
 }

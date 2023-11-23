@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ResponseFormatter;
-use App\Models\Review;
 use App\Models\User;
+use App\Models\Review;
 use Illuminate\Http\Request;
+use App\Helpers\PaginationHelper;
+use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
@@ -199,5 +200,42 @@ class ReviewController extends Controller
         } else {
             return ResponseFormatter::error('', 'Data Tidak Ditemukan');
         }
+    }
+
+    public function getList(Request $request) {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+
+        if ($perPage === "bypass") {
+            $reviews = Review::with('user', 'category')->get();
+            $total = $reviews->count();
+            $data = $reviews->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'user' => $review->user->name,
+                    'category' => $review->category->name,
+                    'rating' => $review->rating,
+                    'comment' => $review->comment
+                ];
+            });
+        } else {
+            $paginator = Review::with('user', 'category')->paginate($perPage, ['*'], 'page', $page);
+            $data = $paginator->items();
+            $total = $paginator->total();
+        }
+
+        $nextPageUrl = $perPage === 'bypass' ? null : PaginationHelper::getNextPageUrl($request, $page, $perPage, $total);
+        $prevPageUrl = $perPage === 'bypass' ? null : PaginationHelper::getPrevPageUrl($request, $page, $perPage);
+
+        return ResponseFormatter::success([
+            'current_page' => (int)$page,
+            'data' => $data,
+            'next_page_url' => $nextPageUrl,
+            'path' => $request->url(),
+            'per_page' => (int)$perPage,
+            'prev_page_url' => $prevPageUrl,
+            'to' => (int)$page * (int)$perPage,
+            'total' => (int)$total,
+        ], 'Berhasil Menampilkan Data Review');
     }
 }

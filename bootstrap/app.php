@@ -63,6 +63,7 @@ $app->register(App\Providers\CatchAllOptionsRequestsProvider::class);
 $app->configure('jwt');
 $app->configure('app');
 $app->configure('cors');
+// $app->configure('helpers');
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +104,7 @@ $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+
 // $app->bind('signature-url', function ($app) {
 //     return new \App\Helpers\SignatureUrlHelper;
 // });
