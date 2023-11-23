@@ -52,7 +52,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->get('gallery/edit/{id}', ['uses' => 'GalleryController@edit']);
         $router->post('gallery', ['uses' => 'GalleryController@store']);
         $router->post('gallery/{id}', ['uses' => 'GalleryController@update']);
-        $router->delete('gallery/{id}', ['uses' => 'GalleryController@destroy']);
+        $router->delete('gallery/delete', ['uses' => 'GalleryController@destroy']);
 
         //status
         $router->get('status', ['uses' => 'StatusController@index']);

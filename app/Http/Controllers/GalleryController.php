@@ -94,10 +94,10 @@ class GalleryController extends Controller
         // Menentukan aturan validasi
         $rules = [
             'tittle' => 'required|string',
-            'description' => 'required|string',
+            'description' => 'required',
             'category_id' => 'required',
             'status_id' => 'required',
-            'image' => 'required|image',
+            'image' => 'required',
         ];
 
         // Melakukan validasi
@@ -105,7 +105,7 @@ class GalleryController extends Controller
 
         // Cek apakah validasi gagal
         if ($validator->fails()) {
-            return ResponseFormatter::error('', 'Validasi Gagal');
+            return ResponseFormatter::error('', $validator->errors());
         }
 
         try {
@@ -270,13 +270,14 @@ class GalleryController extends Controller
      * @param \App\Models\Gallery $gallery
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
+        $id = $request->input('id');
         $gallery = Gallery::find($id);
 
         if ($gallery) {
             // Hapus file terkait
-            $fileToDelete = base_path('public/upload/' . $gallery->file);
+            $fileToDelete = base_path('public/upload/' . $gallery->image);
             if (file_exists($fileToDelete)) {
                 unlink($fileToDelete);
             }
