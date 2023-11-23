@@ -161,7 +161,7 @@ class UserController extends Controller
         if (is_null($user)) {
             return ResponseFormatter::error('', 'User Tidak Ditemukan');
         }
-
+        $user->delete();
         return ResponseFormatter::success('', 'Data User Berhasil Dihapus');
     }
 

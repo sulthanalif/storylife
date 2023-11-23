@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Order;
+use App\Models\Category;
+use App\Models\StatusOrder;
 use Illuminate\Http\Request;
 use App\Helpers\PaginationHelper;
 use App\Helpers\ResponseFormatter;
-use App\Models\Category;
-use App\Models\StatusOrder;
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
@@ -61,8 +63,46 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'user_id'
+            'user_id' => 'required',
+            'category_id' => 'required',
+            'status_id' => 'required',
+            'booked_at' => 'required',
+            'note' => 'required',
+            'price' => 'required',
         ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error('', $validator->errors());
+        }
+
+        try {
+            DB::transaction(function () use ($request, &$order) {
+                $user = $request->input('user_id');
+                $category = $request->input('category_id');
+                $statusOrder = $request->input('status_id');
+                $booked_at = $request->input('booked_at');
+                $note = $request->input('note');
+                $price = $request->input('price');
+
+                $order = Order::create([
+                    'user_id' => $user,
+                    'category_id' => $category,
+                    'status_id' => $statusOrder,
+                    'booked_at' => $booked_at,
+                    'note' => $note,
+                    'price' => $price,
+                ]);
+            });
+            if ($order) {
+                return ResponseFormatter::success($order, 'Data Berhasil Ditambahkan');
+            } else {
+                return ResponseFormatter::error('', 'Data Gagal Disimpan');
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('', 'Terjadi Kesalahan Pada Sistem');
+        }
     }
 
     /**
@@ -71,9 +111,25 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function show(Order $order)
+    public function show(Request $request)
     {
-        //
+        $id = $request->input('id');
+        $order = Order::with('user', 'category', 'statusOrder')->where('id', $id)->first();
+
+        if($order) {
+            $data = [
+                'id' => $order->id,
+                    'user' => $order->user->email,
+                    'category' => $order->category->name,
+                    'status_order' => $order->statusOrder->name,
+                    'booked_at' => $order->booked_at,
+                    'note' => $order->note,
+                    'price' => $order->price
+            ];
+            return ResponseFormatter::success($data, 'Succeess Menampilkan Data');
+        } else {
+            return ResponseFormatter::error('', 'Gagal Menampilkan Data');
+        }
     }
 
     /**
@@ -82,9 +138,29 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function edit(Order $order)
-    {
-        //
+    public function edit(Request $request)
+    {  
+        $id = $request->input('id');
+
+        try {
+            $order = Order::where('id', $id)->first();
+            $users = User::select('id', 'name', 'email')->get();
+            $categories = Category::select('id', 'name')->get();
+            $statusOrders = StatusOrder::select('id', 'name')->get();
+
+            if($order && $users && $categories && $statusOrders) {
+                return ResponseFormatter::success([
+                    'order' => $order,
+                    'user' => $users,
+                    'category' => $categories,
+                    'statusOrder' => $statusOrders
+                ], 'Success menampilkan form Edit');
+            } else {
+                return ResponseFormatter::error('', 'Ada Yang Error');
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('', 'Terjadi Kesalahan Pada Sistem');
+        }
     }
 
     /**
@@ -105,10 +181,18 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Order $order)
+    public function destroy(Request $request)
     {
-        //
-    }
+        $order = Order::find($request->input('id'));
+
+        if ($order) {
+            $order->delete();
+
+            return ResponseFormatter::success('', 'Data Berhasil Dihapus');
+        } else {
+            return ResponseFormatter::error('', 'Gagal Menghapus Data');
+        }
+    } 
 
     public function getList(Request $request) {
         $perPage = $request->input('per_page', 10);

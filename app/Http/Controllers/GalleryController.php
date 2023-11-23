@@ -146,8 +146,9 @@ class GalleryController extends Controller
      * @param \App\Models\Gallery $gallery
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show(Request $request)
     {
+        $id = $request->input('id');
         $gallery = Gallery::with('category', 'status')->where('id', $id)->first();
         if ($gallery) {
             $data = [

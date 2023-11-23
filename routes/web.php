@@ -45,9 +45,10 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->get('/get-token', 'AuthController@getToken');
         $router->get('/refresh-token', 'AuthController@refreshToken');
 
+        //gallery
         $router->get('gallery', ['uses' => 'GalleryController@index']);
         $router->get('gallery/create', ['uses' => 'GalleryController@create ']);
-        $router->get('gallery/{id}', ['uses' => 'GalleryController@show']);
+        $router->get('gallery/show', ['uses' => 'GalleryController@show']);
         $router->get('gallery/edit/{id}', ['uses' => 'GalleryController@edit']);
         $router->post('gallery', ['uses' => 'GalleryController@store']);
         $router->post('gallery/{id}', ['uses' => 'GalleryController@update']);
@@ -111,7 +112,8 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
 
         //order
-        
+        $router->get('/order/form-create', ['uses' => 'OrderController@create']);
+
     });
 });
 
