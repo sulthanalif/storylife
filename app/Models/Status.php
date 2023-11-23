@@ -23,12 +23,19 @@ class Status extends Model
     {
         return $this->belongsTo(Service::class);
     }
+
     public function sosmed() 
     {
         return $this->belongsTo(Sosmed::class);
     }
+
     public function gallery() 
     {
         return $this->belongsTo(Gallery::class);
+    }
+
+    public function review() 
+    {
+        return $this->belongsTo(Review::class);
     }
 }

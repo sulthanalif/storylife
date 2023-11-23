@@ -22,16 +22,28 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->post('/register', 'AuthController@register');
     $router->post('/login', 'AuthController@login');
     $router->get('/order', 'OrderController@index');
-    $router->get('/gallery/get-list', 'GalleryController@getList');
-    $router->get('/review/get-list', 'ReviewController@getList');
+   
     $router->get('/review', ['uses' => 'ReviewController@index']);
     $router->get('/category', ['uses' => 'CategoryController@index']);
     $router->get('service', ['uses' => 'ServiceController@index']);
     
+    //cek
+    $router->get('/order/form-create', ['uses' => 'OrderController@create']);
+
+
+
+    //getList
+    $router->get('/gallery/get-list', 'GalleryController@getList');
+    $router->get('/review/get-list', 'ReviewController@getList');
+    $router->get('/category/get-list', 'CategoryController@getList');
+    $router->get('/order/get-list', 'OrderController@getList');
+
+    //Auth
     $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
         $router->get('/dashboard', ['uses' => 'DashboardController@index']);
         $router->post('/logout', 'AuthController@logout');
         $router->get('/get-token', 'AuthController@getToken');
+        $router->get('/refresh-token', 'AuthController@refreshToken');
 
         $router->get('gallery', ['uses' => 'GalleryController@index']);
         $router->get('gallery/create', ['uses' => 'GalleryController@create ']);

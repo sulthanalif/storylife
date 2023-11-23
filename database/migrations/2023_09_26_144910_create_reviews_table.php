@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('user_id');
             $table->uuid('category_id')->nullable();
+            $table->uuid('status_id')->nullable();
             $table->string('rating');
             $table->text('comment');
             $table->softDeletes();
@@ -22,6 +23,7 @@ return new class extends Migration
 
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('category_id')->references('id')->on('categories');
+            $table->foreign('status_id')->references('id')->on('statuses');
         });
     }
 

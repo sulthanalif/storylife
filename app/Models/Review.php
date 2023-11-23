@@ -15,7 +15,7 @@ class Review extends Model
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $fillable = [
-        'user_id', 'category_id', 'rating', 'comment'
+        'user_id', 'category_id', 'status_id','rating', 'comment'
     ];
     
 
@@ -27,5 +27,10 @@ class Review extends Model
     public function category()
     {
         return $this->hasOne(Category::class, 'id', 'category_id');
+    }
+
+    public function status()
+    {
+        return $this->hasOne(Status::class, 'id', 'status_id');
     }
 }
