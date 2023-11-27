@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Review;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Services\SearchService;
 use App\Helpers\PaginationHelper;
 use App\Helpers\ResponseFormatter;
-use App\Models\Category;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,6 +18,21 @@ class ReviewController extends Controller
 //    {
 //        $this->middleware('auth');
 //    }
+
+    protected $searchService;
+
+    public function __construct(SearchService $searchService)
+    {
+        $this->searchService = $searchService;
+    }
+
+    public function search(Request $request)
+    {
+        $searchableColumns = ['category_id', 'rating', 'comment'];
+        $searchResults = $this->searchService->search($request, Review::class, $searchableColumns);
+
+        return ResponseFormatter::success($searchResults, 'Hasil PEncarian');
+    }
 
     /**
      * Display a listing of the resource.

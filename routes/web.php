@@ -100,7 +100,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         $router->post('category/{id}', ['uses' => 'CategoryController@update']);
 
-        $router->delete('category/{id}', ['uses' => 'CategoryController@destroy']);
+        $router->delete('category', ['uses' => 'CategoryController@destroy']);
         
         //review
         $router->get('review/show', ['uses' => 'ReviewController@show']);
