@@ -103,13 +103,14 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->delete('category/{id}', ['uses' => 'CategoryController@destroy']);
         
         //review
-        $router->get('review/{id}', ['uses' => 'ReviewController@show']);
+        $router->get('review/show', ['uses' => 'ReviewController@show']);
+        $router->get('review/create', ['uses' => 'ReviewController@create']);
 
         $router->post('review', ['uses' => 'ReviewController@store']);
 
         $router->post('review/{id}', ['uses' => 'ReviewController@update']);
 
-        $router->delete('review/{id}', ['uses' => 'ReviewController@destroy']);
+        $router->delete('review', ['uses' => 'ReviewController@destroy']);
 
         //order
         $router->get('/order/form-create', ['uses' => 'OrderController@create']);

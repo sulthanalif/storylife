@@ -22,9 +22,9 @@ class DashboardController extends Controller
         $reviews = Review::with('category')->get();
 
         $stat = [
-            'reviews' => $reviews->count(),
-            'order_success' => $order_success->count(),
-            'order_pending' => $order_pending->count(),
+            'Review' => $reviews->count(),
+            'Order_Success' => $order_success->count(),
+            'Order_Pending' => $order_pending->count(),
         ];
 
         $pesananBaruSelesai = $order_success->map(function ($order) {

@@ -7,6 +7,8 @@ use App\Models\Review;
 use Illuminate\Http\Request;
 use App\Helpers\PaginationHelper;
 use App\Helpers\ResponseFormatter;
+use App\Models\Category;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
@@ -39,7 +41,20 @@ class ReviewController extends Controller
      */
     public function create()
     {
-        return ResponseFormatter::success('', 'Tampilan Bikin Review');
+        $categories = Category::get();
+
+        if (!$categories) {
+            return ResponseFormatter::error('', 'Categories Tidak Ada Data!');
+        }
+
+        $category = $categories->map(function ($data) {
+            return [
+                'id' => $data->id,
+                'name' => $data->name,
+                'description' => $data->description
+            ];
+        });
+        return ResponseFormatter::success($category, 'Tampilan Bikin Review');
     }
 
     /**
@@ -64,10 +79,9 @@ class ReviewController extends Controller
             return ResponseFormatter::error('', $validator->errors());
         }
 
-        //cari user yg sedang komen
-        $apiToken = explode(' ', $request->header('Authorization'));
+       
 
-        $user = User::where('api_token', $apiToken[1])->first();
+        $user = JWTAuth::parseToken()->authenticate();
 
         //ambil data form
         $category_id = $request->input('category_id');
@@ -96,16 +110,24 @@ class ReviewController extends Controller
      * @param \App\Models\Review $review
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request)
     {
         //cari data
+        $id = $request->input('id');
         $review = Review::find($id);
 
         if (!$review) {
             return ResponseFormatter::error('', 'Data Tidak Ditemukan');
         }
 
-        return ResponseFormatter::success($review, 'Data Ditemukan');
+        $data = [
+            'id' => $review->id,
+            'user' => $review->user->name,
+            'category' => $review->category->name,
+            'rating' => (int)$review->rating,
+            'comment' => $review->comment
+        ];
+        return ResponseFormatter::success($data, 'Data Ditemukan');
     }
 
     /**
@@ -188,9 +210,10 @@ class ReviewController extends Controller
      * @param \App\Models\Review $review
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
         //cari data
+        $id = $request->input('id');
         $review = Review::find($id);
 
         if ($review) {
@@ -214,13 +237,22 @@ class ReviewController extends Controller
                     'id' => $review->id,
                     'user' => $review->user->name,
                     'category' => $review->category->name,
-                    'rating' => $review->rating,
+                    'rating' => (int)$review->rating,
                     'comment' => $review->comment
                 ];
             });
         } else {
             $paginator = Review::with('user', 'category')->paginate($perPage, ['*'], 'page', $page);
-            $data = $paginator->items();
+            $reviews = $paginator->items();
+            $data = collect($reviews)->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'user' => $review->user->name,
+                    'category' => $review->category->name,
+                    'rating' => (int)$review->rating,
+                    'comment' => $review->comment
+                ];
+            });
             $total = $paginator->total();
         }
 

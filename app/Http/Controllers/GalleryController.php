@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\PaginationHelper;
+use App\Helpers\ImageCompressor;
 
 // use function Laravel\Prompts\select;
 
@@ -97,7 +98,7 @@ class GalleryController extends Controller
             'description' => 'required',
             'category_id' => 'required',
             'status_id' => 'required',
-            'image' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
 
         // Melakukan validasi
@@ -115,9 +116,8 @@ class GalleryController extends Controller
                 $category_id = $request->input('category_id');
                 $status_id = $request->input('status_id');
                 $file = $request->file('image');
-                // mendapatkan original extensionnya
+
                 $imageData = $file->getClientOriginalExtension();
-                //membuat nama file dengan epochtime
                 $image = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData;
                 $galleries = Gallery::create([
                     'tittle' => $tittle,
