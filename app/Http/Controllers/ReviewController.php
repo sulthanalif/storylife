@@ -11,8 +11,11 @@ use App\Helpers\PaginationHelper;
 use App\Helpers\ResponseFormatter;
 use App\Models\Status;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Support\Facades\Redis;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Validator;
+
+use function PHPUnit\Framework\isEmpty;
 
 class ReviewController extends Controller
 {
@@ -366,5 +369,52 @@ class ReviewController extends Controller
             'to' => (int)$page * (int)$perPage,
             'total' => (int)$total,
         ], 'Berhasil Menampilkan Data Review');
+    }
+
+    public function trash()
+    {
+        $reviews = Review::with('user', 'category', 'status')->onlyTrashed()->get();
+
+        if (!$reviews) {
+            return ResponseFormatter::success('', 'Tidak Ada Data');
+        }
+
+        $data = $reviews->map(function ($review) {
+            return [
+                'id' => $review->id,
+                'user' => $review->user->name,
+                'category' => $review->category->name,
+                'status' => $review->status->name,
+                'rating' => (int)$review->rating,
+                'comment' => $review->comment,
+                'delete_at' => $review->deleted_at
+            ];
+        });
+
+        if (isEmpty($data)) {
+            return ResponseFormatter::success('', 'Trash Kosong');
+        }
+
+        return ResponseFormatter::success($data, 'Trash');
+    }
+
+    public function restore(Request $request) 
+    {
+        $id = $request->input('id');
+    
+        try {
+            $data = Review::withTrashed()->where('id', $id)->first();
+
+            if (!$data) {
+                return ResponseFormatter::error('', 'Data tidak ditemukan');
+            }
+
+            // Lakukan restore
+            $data->restore();
+
+            return ResponseFormatter::success('', 'Berhasil Restore');
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('', 'Gagal Restore Data');
+        }
     }
 }

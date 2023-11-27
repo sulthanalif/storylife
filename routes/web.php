@@ -37,6 +37,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->get('/review/get-list', 'ReviewController@getList');
     $router->get('/category/get-list', 'CategoryController@getList');
     $router->get('/order/get-list', 'OrderController@getList');
+    $router->get('/user/get-list', 'UserController@getList');
 
     //Auth
     $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
@@ -78,7 +79,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         //user
         $router->get('user', ['uses' => 'UserController@index']);
 
-        $router->get('user/{id}', ['uses' => 'UserController@show']);
+        $router->get('user/show', ['uses' => 'UserController@show']);
 
         $router->post('user', ['uses' => 'UserController@store']);
 
@@ -91,7 +92,6 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         $router->delete('user/{id}', ['uses' => 'UserController@destroy']);
 
-        $router->get('cekcek', ['uses', 'UserController@cek']);
         
         //category
         $router->get('category/{id}', ['uses' => 'CategoryController@show']);
@@ -111,9 +111,16 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->post('review/{id}', ['uses' => 'ReviewController@update']);
 
         $router->delete('review', ['uses' => 'ReviewController@destroy']);
+            //search
         $router->get('review/search', ['uses' => 'ReviewController@search']);
+            //approve and reject
         $router->put('review/approve', ['uses' => 'ReviewController@approve']);
         $router->put('review/reject', ['uses' => 'ReviewController@reject']);
+            //trash
+        $router->get('review/trash', ['uses' => 'ReviewController@trash']);
+            //restore
+        $router->put('review/restore', ['uses' => 'ReviewController@restore']);
+        
 
         //order
         $router->get('/order/form-create', ['uses' => 'OrderController@create']);
