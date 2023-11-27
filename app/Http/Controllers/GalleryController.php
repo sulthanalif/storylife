@@ -7,12 +7,13 @@ use App\Models\Gallery;
 use App\Models\Category;
 use App\Helpers\EncodeFile;
 use Illuminate\Http\Request;
+use App\Helpers\ImageCompressor;
+use App\Helpers\PaginationHelper;
 use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Validator;
-use App\Helpers\PaginationHelper;
-use App\Helpers\ImageCompressor;
 
 // use function Laravel\Prompts\select;
 
@@ -109,34 +110,39 @@ class GalleryController extends Controller
             return ResponseFormatter::error('', $validator->errors());
         }
 
-        try {
+        // try {
             DB::transaction(function () use ($request, &$galleries) {
                 $tittle = $request->input('tittle');
                 $description = $request->input('description');
                 $category_id = $request->input('category_id');
                 $status_id = $request->input('status_id');
                 $file = $request->file('image');
-
+    
+                // Manipulasi gambar menggunakan Intervention Image
+                $image = Image::make($file);
+                $image->resize(800, 600); // Tentukan resolusi yang diinginkan
                 $imageData = $file->getClientOriginalExtension();
-                $image = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData;
+                $imageFileName = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData;
+    
+                // Simpan file dengan nama yang sudah dikodekan ke direktori yang sesuai
+                $image->save(base_path() . '/' . env('UPLOADS_DIRECTORY') . '/' . $imageFileName);
+    
                 $galleries = Gallery::create([
                     'tittle' => $tittle,
                     'description' => $description,
                     'category_id' => $category_id,
                     'status_id' => $status_id,
-                    'image' => $image
+                    'image' => $imageFileName,
                 ]);
-                // Simpan file dengan nama yang sudah dikodekan ke direktori public/upload
-                $file->move(base_path('public/upload'), $image);
             });
             if ($galleries) {
                 return ResponseFormatter::success($galleries, 'Data Berhasil Disimpan');
             } else {
                 return ResponseFormatter::error('', 'Data Gagal Disimpan');
             }
-        } catch (\Exception $e) {
-            return ResponseFormatter::error('', 'Terjadi Kesalahan Sistem');
-        }
+        // } catch (\Exception $e) {
+        //     return ResponseFormatter::error('', 'Terjadi Kesalahan Sistem');
+        // }
     }
 
 
@@ -172,8 +178,18 @@ class GalleryController extends Controller
      * @param \App\Models\Gallery $gallery
      * @return \Illuminate\Http\JsonResponse
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
+        $id = $request->input('id');
+        $status = Status::select('id', 'name')->get();
+        
+        $category = Category::select('id', 'name')->get();
+
+        $select = [
+            'status' => $status,
+            'category' => $category
+        ];
+
         $gallery = Gallery::with('category', 'status')->where('id', $id)->first();
         if ($gallery) {
             $data = [
@@ -189,6 +205,7 @@ class GalleryController extends Controller
                 'tittle' => $gallery->tittle,
                 'description' => $gallery->description,
                 'image' => EncodeFile::encodeFile(base_path('public/upload/'.$gallery->image)),
+                'list' => $select
             ];
             return ResponseFormatter::success($data, 'Data Ditemukan');
         } else {
@@ -203,7 +220,7 @@ class GalleryController extends Controller
      * @param \App\Models\Gallery $gallery
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         //rules
         $rules = [
@@ -222,9 +239,10 @@ class GalleryController extends Controller
         }
 
 
-
+        $id = $request->input('id');
         try {
             DB::transaction(function () use ($request, $id, &$galleries) {
+                
                 $gallery = Gallery::where('id', $id)->first();
 
                 if (!$gallery) {
@@ -241,18 +259,19 @@ class GalleryController extends Controller
                 $description = $request->input('description');
                 $category_id = $request->input('category_id');
                 $file = $request->file('image');
-                // mendapatkan original extensionnya
+               // Manipulasi gambar menggunakan Intervention Image
+                $image = Image::make($file);
+                $image->resize(800, 600); // Tentukan resolusi yang diinginkan
                 $imageData = $file->getClientOriginalExtension();
-                //membuat nama file dengan epochtime
-                $image = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData;
+                $imageFileName = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData;
+                $image->save(base_path('public/upload') . '/' . $imageFileName);
                 $galleries = $gallery->update([
                     'tittle' => $tittle,
                     'description' => $description,
                     'category_id' => $category_id,
-                    'image' => $image
+                    'image' => $imageFileName
                 ]);
-                // Simpan file dengan nama yang sudah dikodekan ke direktori public/upload
-                $file->move(base_path('public/upload'), $image);
+                
             });
             if ($galleries) {
                 return ResponseFormatter::success($galleries, 'Data Berhasil Disimpan');

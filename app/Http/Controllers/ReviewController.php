@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\Services\SearchService;
 use App\Helpers\PaginationHelper;
 use App\Helpers\ResponseFormatter;
+use App\Models\Status;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Validator;
 
@@ -31,7 +33,10 @@ class ReviewController extends Controller
         $searchableColumns = ['category_id', 'rating', 'comment'];
         $searchResults = $this->searchService->search($request, Review::class, $searchableColumns);
 
-        return ResponseFormatter::success($searchResults, 'Hasil PEncarian');
+        if (!$searchResults) {
+            return ResponseFormatter::error('', 'Gagal Mencari Data');
+        }
+        return ResponseFormatter::success(collect($searchResults), 'Hasil Pencarian');
     }
 
     /**
@@ -98,7 +103,7 @@ class ReviewController extends Controller
        
 
         $user = JWTAuth::parseToken()->authenticate();
-
+        $status = Status::where('name', 'Pending')->first();
         //ambil data form
         $category_id = $request->input('category_id');
         $rating = $request->input('rating');
@@ -108,6 +113,7 @@ class ReviewController extends Controller
         $simpan = Review::create([
             'user_id' => $user->id,
             'category_id' => $category_id,
+            'status_id' => $status->id,
             'rating' => $rating,
             'comment' => $comment
         ]);
@@ -130,7 +136,7 @@ class ReviewController extends Controller
     {
         //cari data
         $id = $request->input('id');
-        $review = Review::find($id);
+        $review = Review::with('category', 'user', 'status')->where('id', $id)->first();
 
         if (!$review) {
             return ResponseFormatter::error('', 'Data Tidak Ditemukan');
@@ -140,6 +146,7 @@ class ReviewController extends Controller
             'id' => $review->id,
             'user' => $review->user->name,
             'category' => $review->category->name,
+            'status' => $review->status->name,
             'rating' => (int)$review->rating,
             'comment' => $review->comment
         ];
@@ -241,11 +248,83 @@ class ReviewController extends Controller
         }
     }
 
+    public function approve(Request $request) 
+    {
+        try {
+            $id = $request->input('id');
+            $review = Review::with('category', 'user', 'status')->where('id', $id)->first();
+            $status = Status::where('name', 'Active')->first();
+            $data = [
+                'id' => $review->id,
+                'user' => $review->user->name,
+                'category' => $review->category->name,
+                'status' => $review->status->name,
+                'rating' => (int)$review->rating,
+                'comment' => $review->comment
+            ];
+
+            if ($review->status->name === "Active") {
+                return ResponseFormatter::success($data, 'Data Sudah Active');
+            } else {
+                if ($review) {
+                    //simpan data
+                    $simpan = $review->update([
+                    'status_id' => $status->id,
+                    ]);
+    
+                    if ($status) {
+                        return ResponseFormatter::success($simpan, 'Review Approved');
+                    } else {
+                        return ResponseFormatter::error('', 'Review Gagal Approved');
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('', 'Terjadi Kesalahan Sistem');
+        }
+    }
+
+    public function reject(Request $request) 
+    {
+        try {
+            $id = $request->input('id');
+            $review = Review::with('category', 'user', 'status')->where('id', $id)->first();
+            $status = Status::where('name', 'Draft')->first();
+            $data = [
+                'id' => $review->id,
+                'user' => $review->user->name,
+                'category' => $review->category->name,
+                'status' => $review->status->name,
+                'rating' => (int)$review->rating,
+                'comment' => $review->comment
+            ];
+
+            if ($review->status->name === "Draft") {
+                return ResponseFormatter::success($data, 'Data Sudah Reject masuk ke draft');
+            } else {
+                if ($review) {
+                    //simpan data
+                    $simpan = $review->update([
+                    'status_id' => $status->id,
+                    ]);
+    
+                    if ($status) {
+                        return ResponseFormatter::success($simpan, 'Review Rejected');
+                    } else {
+                        return ResponseFormatter::error('', 'Review Gagal Rejected');
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('', 'Terjadi Kesalahan Sistem');
+        }
+    }
+
     public function getList(Request $request) {
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 10);
 
-        if ($perPage === "bypass") {
+        if ($perPage === "bypass" || $page === "bypass") {
             $reviews = Review::with('user', 'category')->get();
             $total = $reviews->count();
             $data = $reviews->map(function ($review) {
@@ -253,6 +332,7 @@ class ReviewController extends Controller
                     'id' => $review->id,
                     'user' => $review->user->name,
                     'category' => $review->category->name,
+                    'status' => $review->status->name,
                     'rating' => (int)$review->rating,
                     'comment' => $review->comment
                 ];
@@ -265,6 +345,7 @@ class ReviewController extends Controller
                     'id' => $review->id,
                     'user' => $review->user->name,
                     'category' => $review->category->name,
+                    'status' => $review->status->name,
                     'rating' => (int)$review->rating,
                     'comment' => $review->comment
                 ];
@@ -272,8 +353,8 @@ class ReviewController extends Controller
             $total = $paginator->total();
         }
 
-        $nextPageUrl = $perPage === 'bypass' ? null : PaginationHelper::getNextPageUrl($request, $page, $perPage, $total);
-        $prevPageUrl = $perPage === 'bypass' ? null : PaginationHelper::getPrevPageUrl($request, $page, $perPage);
+        $nextPageUrl = $perPage === 'bypass' || $page === "bypass" ? null : PaginationHelper::getNextPageUrl($request, $page, $perPage, $total);
+        $prevPageUrl = $perPage === 'bypass' || $page === "bypass" ? null : PaginationHelper::getPrevPageUrl($request, $page, $perPage);
 
         return ResponseFormatter::success([
             'current_page' => (int)$page,

@@ -47,9 +47,9 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         //gallery
         $router->get('gallery', ['uses' => 'GalleryController@index']);
-        $router->get('gallery/create', ['uses' => 'GalleryController@create ']);
+        $router->get('gallery/create', ['uses' => 'GalleryController@create']);
         $router->get('gallery/show', ['uses' => 'GalleryController@show']);
-        $router->get('gallery/edit/{id}', ['uses' => 'GalleryController@edit']);
+        $router->get('gallery/edit', ['uses' => 'GalleryController@edit']);
         $router->post('gallery', ['uses' => 'GalleryController@store']);
         $router->post('gallery/{id}', ['uses' => 'GalleryController@update']);
         $router->delete('gallery/delete', ['uses' => 'GalleryController@destroy']);
@@ -111,6 +111,9 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->post('review/{id}', ['uses' => 'ReviewController@update']);
 
         $router->delete('review', ['uses' => 'ReviewController@destroy']);
+        $router->get('review/search', ['uses' => 'ReviewController@search']);
+        $router->put('review/approve', ['uses' => 'ReviewController@approve']);
+        $router->put('review/reject', ['uses' => 'ReviewController@reject']);
 
         //order
         $router->get('/order/form-create', ['uses' => 'OrderController@create']);

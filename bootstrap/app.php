@@ -106,6 +106,7 @@ $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Intervention\Image\ImageServiceProvider::class);
+$app->alias('Image', Intervention\Image\Facades\Image::class);
 
 // $app->bind('signature-url', function ($app) {
 //     return new \App\Helpers\SignatureUrlHelper;
