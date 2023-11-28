@@ -44,7 +44,7 @@ class DashboardController extends Controller
                 'id' => $review->id,
                 'user' => $review->user->name,
                 'category' => $review->category->name,
-                'rating' => $review->rating,
+                'rating' => (int)$review->rating,
                 'comment' => $review->comment
             ];
         })->take(5);
