@@ -120,12 +120,16 @@ class GalleryController extends Controller
     
                 // Manipulasi gambar menggunakan Intervention Image
                 $image = Image::make($file);
-                $image->resize(800, 600); // Tentukan resolusi yang diinginkan
-                $imageData = $file->getClientOriginalExtension();
-                $imageFileName = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData;
+                $image->resize(800, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+                // $imageData = $file->getClientOriginalExtension();
+                // Extract the filename without the extension
+                $imageData = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $imageFileName = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData . '.webp';
     
                 // Simpan file dengan nama yang sudah dikodekan ke direktori yang sesuai
-                $image->save(base_path() . '/' . env('UPLOADS_DIRECTORY') . '/' . $imageFileName);
+                $image->save(base_path() . '/' . env('UPLOADS_DIRECTORY') . '/' . $imageFileName, 90, 'webp');
     
                 $galleries = Gallery::create([
                     'tittle' => $tittle,
@@ -228,7 +232,7 @@ class GalleryController extends Controller
             'description' => 'required|string',
             'category_id' => 'required',
             'status_id' => 'required',
-            'image' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
 
         // Melakukan validasi
@@ -259,12 +263,17 @@ class GalleryController extends Controller
                 $description = $request->input('description');
                 $category_id = $request->input('category_id');
                 $file = $request->file('image');
-               // Manipulasi gambar menggunakan Intervention Image
+                // Manipulasi gambar menggunakan Intervention Image
                 $image = Image::make($file);
-                $image->resize(800, 600); // Tentukan resolusi yang diinginkan
-                $imageData = $file->getClientOriginalExtension();
-                $imageFileName = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData;
-                $image->save(base_path('public/upload') . '/' . $imageFileName);
+                $image->resize(800, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+                // Extract the filename without the extension
+                $imageData = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $imageFileName = strtotime(date('Y-m-d H:i:s')) . '.' . $imageData . '.webp';
+                //simpan
+                $image->save(base_path() . '/' . env('UPLOADS_DIRECTORY') . '/' . $imageFileName, 90, 'webp');
+                
                 $galleries = $gallery->update([
                     'tittle' => $tittle,
                     'description' => $description,

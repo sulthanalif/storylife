@@ -50,7 +50,7 @@ class DashboardController extends Controller
         })->take(5);
        
 
-        return ResponseFormatter::success( [
+        return ResponseFormatter::success([
             'stat' => $stat,
             'pesananBaruSelesai' => $pesananBaruSelesai,
             'review' => $review

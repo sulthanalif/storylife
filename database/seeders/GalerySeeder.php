@@ -17,7 +17,7 @@ class GalerySeeder extends Seeder
     {
         $category = Category::where('name', 'Hunting')->first();
         $status = Status::where('name', 'Active')->first();
-        $imagePath = 'service.jpg';
+        $imagePath = 'imageDummy.webp';
 
     	$datas = [
             [
