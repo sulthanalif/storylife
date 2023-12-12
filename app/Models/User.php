@@ -11,11 +11,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Auth\MustVerifyEmail;
 
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
-    use Authenticatable, Authorizable, HasFactory, UUIDGenerator, SoftDeletes;
+    use Authenticatable, Authorizable, HasFactory, UUIDGenerator, SoftDeletes, MustVerifyEmail;
 
     protected $table = 'users'; // Specify the table name
     protected $keyType = 'string';

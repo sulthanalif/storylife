@@ -17,13 +17,13 @@ class ServiceSeeder extends Seeder
     public function run(): void
     {
         $status = Status::where('name', 'Active')->first();
-        $imagePath = 'service.jpg';
+        $imagePath = 'imageDummy.webp';
 
         // if (File::exists($imagePath)) {
         //     $imageName = basename($imagePath);
         //     $imageData = EncodeFile::encodeFile($imageName);
         // } else {
-        //     $imageData = null; 
+        //     $imageData = null;
         // }
 
         $services = [

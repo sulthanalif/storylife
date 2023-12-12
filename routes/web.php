@@ -22,11 +22,11 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->post('/register', 'AuthController@register');
     $router->post('/login', 'AuthController@login');
     $router->get('/order', 'OrderController@index');
-   
+
     $router->get('/review', ['uses' => 'ReviewController@index']);
     $router->get('/category', ['uses' => 'CategoryController@index']);
     $router->get('service', ['uses' => 'ServiceController@index']);
-    
+
     //cek
     $router->get('/order/form-create', ['uses' => 'OrderController@create']);
 
@@ -38,6 +38,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->get('/category/get-list', 'CategoryController@getList');
     $router->get('/order/get-list', 'OrderController@getList');
     $router->get('/user/get-list', 'UserController@getList');
+    $router->get('/service/get-list', 'ServiceController@getList');
 
     //Auth
     $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
@@ -92,7 +93,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         $router->delete('user/{id}', ['uses' => 'UserController@destroy']);
 
-        
+
         //category
         $router->get('category/{id}', ['uses' => 'CategoryController@show']);
 
@@ -101,7 +102,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->post('category/{id}', ['uses' => 'CategoryController@update']);
 
         $router->delete('category', ['uses' => 'CategoryController@destroy']);
-        
+
         //review
         $router->get('review/show', ['uses' => 'ReviewController@show']);
         $router->get('review/create', ['uses' => 'ReviewController@create']);
@@ -120,7 +121,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->get('review/trash', ['uses' => 'ReviewController@trash']);
             //restore
         $router->put('review/restore', ['uses' => 'ReviewController@restore']);
-        
+
 
         //order
         $router->get('/order/form-create', ['uses' => 'OrderController@create']);
